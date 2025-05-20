@@ -168,13 +168,15 @@ ${summary.summary.decisions.map((decision) => `- ${decision}`).join("\n")}
         <TabsContent value="summary" className="space-y-6">
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }}>
             <Card>
-              <CardHeader className="bg-gradient-to-r from-orange-500/10 to-amber-500/10">
-                <CardTitle className="flex items-center">
-                  <span className="mr-2 flex h-6 w-6 items-center justify-center rounded-full bg-orange-100 text-xs font-medium text-orange-600">
-                    1
-                  </span>
-                  Key Points
-                </CardTitle>
+              <CardHeader className="p-0 overflow-hidden">
+                <div className="w-full h-10 flex items-center rounded-t-md bg-gradient-to-r from-orange-400 via-orange-500 to-amber-400 px-4">
+                  <CardTitle className="flex items-center text-white font-semibold text-lg">
+                    <span className="mr-2 flex h-6 w-6 items-center justify-center rounded-full bg-white/30 text-xs font-medium text-white">
+                      1
+                    </span>
+                    Key Points
+                  </CardTitle>
+                </div>
               </CardHeader>
               <CardContent className="pt-6">
                 <ul className="space-y-2">
@@ -203,13 +205,15 @@ ${summary.summary.decisions.map((decision) => `- ${decision}`).join("\n")}
             transition={{ duration: 0.3, delay: 0.1 }}
           >
             <Card>
-              <CardHeader className="bg-gradient-to-r from-orange-500/10 to-amber-500/10">
-                <CardTitle className="flex items-center">
-                  <span className="mr-2 flex h-6 w-6 items-center justify-center rounded-full bg-orange-100 text-xs font-medium text-orange-600">
-                    2
-                  </span>
-                  Action Items
-                </CardTitle>
+              <CardHeader className="p-0 overflow-hidden">
+                <div className="w-full h-10 flex items-center rounded-t-md bg-gradient-to-r from-orange-400 via-orange-500 to-amber-400 px-4">
+                  <CardTitle className="flex items-center text-white font-semibold text-lg">
+                    <span className="mr-2 flex h-6 w-6 items-center justify-center rounded-full bg-white/30 text-xs font-medium text-white">
+                      2
+                    </span>
+                    Action Items
+                  </CardTitle>
+                </div>
               </CardHeader>
               <CardContent className="pt-6">
                 <ul className="space-y-4">
@@ -248,13 +252,15 @@ ${summary.summary.decisions.map((decision) => `- ${decision}`).join("\n")}
             transition={{ duration: 0.3, delay: 0.2 }}
           >
             <Card>
-              <CardHeader className="bg-gradient-to-r from-orange-500/10 to-amber-500/10">
-                <CardTitle className="flex items-center">
-                  <span className="mr-2 flex h-6 w-6 items-center justify-center rounded-full bg-orange-100 text-xs font-medium text-orange-600">
-                    3
-                  </span>
-                  Decisions
-                </CardTitle>
+              <CardHeader className="p-0 overflow-hidden">
+                <div className="w-full h-10 flex items-center rounded-t-md bg-gradient-to-r from-orange-400 via-orange-500 to-amber-400 px-4">
+                  <CardTitle className="flex items-center text-white font-semibold text-lg">
+                    <span className="mr-2 flex h-6 w-6 items-center justify-center rounded-full bg-white/30 text-xs font-medium text-white">
+                      3
+                    </span>
+                    Decisions
+                  </CardTitle>
+                </div>
               </CardHeader>
               <CardContent className="pt-6">
                 <ul className="space-y-2">

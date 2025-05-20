@@ -100,7 +100,7 @@ export function SummaryList({ summaries }: SummaryListProps) {
                 variant={selectedTags.includes(tag) ? "default" : "outline"}
                 className={
                   selectedTags.includes(tag)
-                    ? "bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 cursor-pointer transition-all duration-200"
+                    ? "bg-gradient-to-r from-orange-400 via-orange-500 to-amber-400 hover:from-orange-500 hover:to-amber-500 cursor-pointer transition-all duration-200 text-white"
                     : "cursor-pointer hover:bg-orange-50 transition-all duration-200"
                 }
                 onClick={() => toggleTag(tag)}

@@ -62,13 +62,13 @@ export default function Home() {
         <div className="hidden md:flex justify-center">
           <div className="relative h-[400px] w-[400px] rounded-lg overflow-hidden shadow-xl transform transition-all duration-500 hover:scale-105 hover:shadow-2xl">
             <Image
-              src="/placeholder.svg?height=400&width=400"
+              src="/demo_img.png"
               alt="AI Meeting Summarizer"
               width={400}
               height={400}
               className="object-cover"
             />
-            <div className="absolute inset-0 bg-gradient-to-tr from-orange-500/20 to-amber-500/20"></div>
+            <div className="absolute inset-0 bg-gradient-to-tr to-white/30 from-gray-200/60"></div>
           </div>
         </div>
       </section>

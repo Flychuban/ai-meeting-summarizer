@@ -29,12 +29,14 @@ export default function UploadPage() {
 
         <div className="grid gap-6">
           <Card>
-            <CardHeader className="bg-gradient-to-r from-orange-500/10 to-amber-500/10">
-              <CardTitle className="flex items-center">
-                <FileAudio className="mr-2 h-5 w-5 text-orange-500" />
-                Supported Formats
-              </CardTitle>
-              <CardDescription>Our system supports the following audio formats and specifications</CardDescription>
+            <CardHeader className="p-0 overflow-hidden">
+              <div className="w-full h-10 flex items-center rounded-t-md bg-gradient-to-r from-orange-400 via-orange-500 to-amber-400 px-4">
+                <CardTitle className="flex items-center text-white font-semibold text-lg">
+                  <FileAudio className="mr-2 h-5 w-5 text-white" />
+                  Supported Formats
+                </CardTitle>
+              </div>
+              <CardDescription className="mt-2 px-4">Our system supports the following audio formats and specifications</CardDescription>
             </CardHeader>
             <CardContent className="pt-6">
               <div className="grid gap-4 md:grid-cols-3">
@@ -60,11 +62,13 @@ export default function UploadPage() {
           <FileUploader />
 
           <Card>
-            <CardHeader className="bg-gradient-to-r from-orange-500/10 to-amber-500/10">
-              <CardTitle className="flex items-center">
-                <HelpCircle className="mr-2 h-5 w-5 text-orange-500" />
-                Tips for Better Results
-              </CardTitle>
+            <CardHeader className="p-0 overflow-hidden">
+              <div className="w-full h-10 flex items-center rounded-t-md bg-gradient-to-r from-orange-400 via-orange-500 to-amber-400 px-4">
+                <CardTitle className="flex items-center text-white font-semibold text-lg">
+                  <HelpCircle className="mr-2 h-5 w-5 text-white" />
+                  Tips for Better Results
+                </CardTitle>
+              </div>
             </CardHeader>
             <CardContent className="pt-6">
               <ul className="space-y-2">

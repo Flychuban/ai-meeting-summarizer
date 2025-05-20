@@ -23,10 +23,12 @@ export function SummaryCard({ summary }: SummaryCardProps) {
   return (
     <Link href={`/summary/${summary.id}`}>
       <Card className="h-full overflow-hidden transition-all hover:shadow-md hover:border-orange-200 group">
-        <CardHeader className="bg-gradient-to-r from-orange-500/10 to-amber-500/10 pb-2">
-          <CardTitle className="line-clamp-1 group-hover:text-orange-500 transition-colors duration-200">
-            {summary.title}
-          </CardTitle>
+        <CardHeader className="p-0 overflow-hidden">
+          <div className="w-full h-10 flex items-center rounded-t-md bg-gradient-to-r from-orange-400 via-orange-500 to-amber-400 px-4">
+            <CardTitle className="line-clamp-1 text-white font-semibold text-lg">
+              {summary.title}
+            </CardTitle>
+          </div>
         </CardHeader>
         <CardContent className="pt-4">
           <div className="flex items-center text-sm text-gray-500 mb-2">
