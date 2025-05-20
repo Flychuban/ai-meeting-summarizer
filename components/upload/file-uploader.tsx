@@ -202,8 +202,7 @@ export function FileUploader() {
                     </div>
                     <Progress
                       value={uploadProgress}
-                      className="h-2"
-                      indicatorClassName="bg-gradient-to-r from-orange-500 to-amber-500"
+                      className="h-2 bg-primary/20 relative w-full overflow-hidden rounded-full"
                     />
                   </div>
                 )}
