@@ -34,7 +34,7 @@ const mockSummary = {
   },
 }
 
-export default function SummaryPage({ params }: { params: { id: string } }) {
+export default function SummaryPage() {
   // In a real app, you would fetch the summary based on the ID
   const summary = mockSummary
 

@@ -6,7 +6,7 @@ import { Copy, Check } from "lucide-react"
 import { motion } from "framer-motion"
 
 interface JsonViewerProps {
-  data: any
+  data: unknown
 }
 
 export function JsonViewer({ data }: JsonViewerProps) {

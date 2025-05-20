@@ -1,6 +1,7 @@
 "use client"
 
 import type React from "react"
+import Link from "next/link"
 
 import { useState, useRef } from "react"
 import { Button } from "@/components/ui/button"
@@ -225,7 +226,7 @@ export function FileUploader() {
                       className="mt-4 w-full bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 transition-all duration-300"
                       asChild
                     >
-                      <a href="/summary/new">View Summary</a>
+                      <Link href="/summary/new">View Summary</Link>
                     </Button>
                   </motion.div>
                 )}
