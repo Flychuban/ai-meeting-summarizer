@@ -1,5 +1,3 @@
-import { getServerSession } from "next-auth"
-import { redirect } from "next/navigation"
 import { SignUpForm } from "@/components/auth/sign-up-form"
 import type { Metadata } from "next"
 import Link from "next/link"
@@ -9,11 +7,7 @@ export const metadata: Metadata = {
   description: "Create an account to start summarizing your meetings",
 }
 
-export default async function SignUpPage() {
-  const session = await getServerSession()
-  if (session) {
-    redirect("/dashboard")
-  }
+export default function SignUpPage() {
   return (
     <div className="container flex h-screen w-screen flex-col items-center justify-center">
       <Link href="/" className="absolute left-4 top-4 md:left-8 md:top-8 text-lg font-medium">

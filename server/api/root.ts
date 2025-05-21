@@ -1,4 +1,4 @@
-import { createTRPCRouter } from "@/server/api/trpc";
+import { createTRPCRouter } from "./trpc";
 import { meetingRouter } from "./routers/meeting";
 import { authRouter } from "./routers/auth";
 

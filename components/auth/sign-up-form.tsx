@@ -12,24 +12,13 @@ import { Separator } from "@/components/ui/separator"
 import { signIn } from "next-auth/react"
 import { useRouter } from "next/navigation"
 import { toast } from "sonner"
+import { signUpSchema } from "@/lib/validations/auth"
 import { api } from "@/trpc/react"
-
-const formSchema = z.object({
-  name: z.string().min(2, {
-    message: "Name must be at least 2 characters.",
-  }),
-  email: z.string().email({
-    message: "Please enter a valid email address.",
-  }),
-  password: z.string().min(8, {
-    message: "Password must be at least 8 characters.",
-  }),
-})
 
 export function SignUpForm() {
   const [isLoading, setIsLoading] = useState(false)
   const router = useRouter()
-  const signUp = api.auth.signUp.useMutation({
+  const { mutate: createUser } = api.auth.createUser.useMutation({
     onSuccess: async () => {
       await signIn("credentials", {
         email: form.getValues("email"),
@@ -41,11 +30,12 @@ export function SignUpForm() {
     },
     onError: (error) => {
       toast.error(error.message)
+      setIsLoading(false)
     },
   })
 
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+  const form = useForm<z.infer<typeof signUpSchema>>({
+    resolver: zodResolver(signUpSchema),
     defaultValues: {
       name: "",
       email: "",
@@ -53,18 +43,12 @@ export function SignUpForm() {
     },
   })
 
-  async function onSubmit(values: z.infer<typeof formSchema>) {
+  async function onSubmit(values: z.infer<typeof signUpSchema>) {
     setIsLoading(true)
-    try {
-      await signUp.mutateAsync(values)
-    } catch (error) {
-      // Error is handled in the mutation
-    } finally {
-      setIsLoading(false)
-    }
+    createUser(values)
   }
 
-  const handleGithubSignIn = async () => {
+  async function handleGithubSignIn() {
     setIsLoading(true)
     try {
       await signIn("github", { callbackUrl: "/dashboard" })

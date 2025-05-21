@@ -10,31 +10,25 @@ import * as z from "zod"
 import { Github } from "lucide-react"
 import { Separator } from "@/components/ui/separator"
 import { signIn } from "next-auth/react"
-import { useRouter } from "next/navigation"
+import { useRouter, useSearchParams } from "next/navigation"
 import { toast } from "sonner"
-
-const formSchema = z.object({
-  email: z.string().email({
-    message: "Please enter a valid email address.",
-  }),
-  password: z.string().min(1, {
-    message: "Password is required.",
-  }),
-})
+import { loginSchema } from "@/lib/validations/auth"
 
 export function LoginForm() {
   const [isLoading, setIsLoading] = useState(false)
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const callbackUrl = searchParams.get("from") || "/dashboard"
 
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+  const form = useForm<z.infer<typeof loginSchema>>({
+    resolver: zodResolver(loginSchema),
     defaultValues: {
       email: "",
       password: "",
     },
   })
 
-  async function onSubmit(values: z.infer<typeof formSchema>) {
+  async function onSubmit(values: z.infer<typeof loginSchema>) {
     setIsLoading(true)
 
     try {
@@ -45,11 +39,11 @@ export function LoginForm() {
       })
 
       if (result?.error) {
-        toast.error("Invalid credentials")
+        toast.error("Invalid email or password")
         return
       }
 
-      router.push("/dashboard")
+      router.push(callbackUrl)
       router.refresh()
     } catch (error) {
       toast.error("Something went wrong")
@@ -58,10 +52,10 @@ export function LoginForm() {
     }
   }
 
-  const handleGithubSignIn = async () => {
+  async function handleGithubSignIn() {
     setIsLoading(true)
     try {
-      await signIn("github", { callbackUrl: "/dashboard" })
+      await signIn("github", { callbackUrl })
     } catch (error) {
       toast.error("Something went wrong")
     } finally {
