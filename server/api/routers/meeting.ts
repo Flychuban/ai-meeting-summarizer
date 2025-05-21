@@ -90,8 +90,7 @@ export const meetingRouter = createTRPCRouter({
     }),
 
   getForCurrentUser: publicProcedure.query(async ({ ctx }) => {
-    // Get user from session (NextAuth v5, App Router)
-    const userId = ctx.req?.auth?.user?.id
+    const userId = ctx.session?.user?.id
     if (!userId) {
       throw new Error("Not authenticated")
     }
