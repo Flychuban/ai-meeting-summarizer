@@ -4,6 +4,8 @@ import { SummaryList } from "@/components/dashboard/summary-list"
 import { EmptyState } from "@/components/dashboard/empty-state"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { BarChart, FileAudio, Clock, Users } from "lucide-react"
+import { getServerSession } from "next-auth"
+import { redirect } from "next/navigation"
 
 export const metadata: Metadata = {
   title: "Dashboard - AI Meeting Summarizer",
@@ -35,12 +37,17 @@ const mockSummaries = [
   },
 ]
 
-export default function DashboardPage() {
+export default async function DashboardPage() {
+  const session = await getServerSession()
+  if (!session) {
+    redirect("/auth/login")
+  }
+
   const hasSummaries = mockSummaries.length > 0
 
   return (
     <div className="container mx-auto py-10">
-      <DashboardHeader username="John" />
+      <DashboardHeader username={session.user?.name || "User"} />
 
       {hasSummaries && (
         <div className="mt-8 grid gap-6 md:grid-cols-4">

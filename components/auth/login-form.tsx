@@ -9,6 +9,9 @@ import { useForm } from "react-hook-form"
 import * as z from "zod"
 import { Github } from "lucide-react"
 import { Separator } from "@/components/ui/separator"
+import { signIn } from "next-auth/react"
+import { useRouter } from "next/navigation"
+import { toast } from "sonner"
 
 const formSchema = z.object({
   email: z.string().email({
@@ -21,6 +24,7 @@ const formSchema = z.object({
 
 export function LoginForm() {
   const [isLoading, setIsLoading] = useState(false)
+  const router = useRouter()
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -30,18 +34,44 @@ export function LoginForm() {
     },
   })
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
+  async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsLoading(true)
-    // This would be connected to your authentication logic
-    console.log(values)
-    setTimeout(() => {
+
+    try {
+      const result = await signIn("credentials", {
+        email: values.email,
+        password: values.password,
+        redirect: false,
+      })
+
+      if (result?.error) {
+        toast.error("Invalid credentials")
+        return
+      }
+
+      router.push("/dashboard")
+      router.refresh()
+    } catch (error) {
+      toast.error("Something went wrong")
+    } finally {
       setIsLoading(false)
-    }, 1000)
+    }
+  }
+
+  const handleGithubSignIn = async () => {
+    setIsLoading(true)
+    try {
+      await signIn("github", { callbackUrl: "/dashboard" })
+    } catch (error) {
+      toast.error("Something went wrong")
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   return (
     <div className="grid gap-6">
-      <Button variant="outline" disabled={isLoading}>
+      <Button variant="outline" disabled={isLoading} onClick={handleGithubSignIn}>
         <Github className="mr-2 h-4 w-4" />
         Continue with GitHub
       </Button>

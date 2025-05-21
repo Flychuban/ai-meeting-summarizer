@@ -9,6 +9,10 @@ import { useForm } from "react-hook-form"
 import * as z from "zod"
 import { Github } from "lucide-react"
 import { Separator } from "@/components/ui/separator"
+import { signIn } from "next-auth/react"
+import { useRouter } from "next/navigation"
+import { toast } from "sonner"
+import { api } from "@/trpc/react"
 
 const formSchema = z.object({
   name: z.string().min(2, {
@@ -24,6 +28,21 @@ const formSchema = z.object({
 
 export function SignUpForm() {
   const [isLoading, setIsLoading] = useState(false)
+  const router = useRouter()
+  const signUp = api.auth.signUp.useMutation({
+    onSuccess: async () => {
+      await signIn("credentials", {
+        email: form.getValues("email"),
+        password: form.getValues("password"),
+        redirect: false,
+      })
+      router.push("/dashboard")
+      router.refresh()
+    },
+    onError: (error) => {
+      toast.error(error.message)
+    },
+  })
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -34,18 +53,31 @@ export function SignUpForm() {
     },
   })
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
+  async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsLoading(true)
-    // This would be connected to your authentication logic
-    console.log(values)
-    setTimeout(() => {
+    try {
+      await signUp.mutateAsync(values)
+    } catch (error) {
+      // Error is handled in the mutation
+    } finally {
       setIsLoading(false)
-    }, 1000)
+    }
+  }
+
+  const handleGithubSignIn = async () => {
+    setIsLoading(true)
+    try {
+      await signIn("github", { callbackUrl: "/dashboard" })
+    } catch (error) {
+      toast.error("Something went wrong")
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   return (
     <div className="grid gap-6">
-      <Button variant="outline" disabled={isLoading}>
+      <Button variant="outline" disabled={isLoading} onClick={handleGithubSignIn}>
         <Github className="mr-2 h-4 w-4" />
         Continue with GitHub
       </Button>
