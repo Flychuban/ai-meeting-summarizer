@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { createTRPCRouter, publicProcedure } from "../trpc";
-import { safeDbOperation } from "~/lib/db";
+import { safeDbOperation } from "@/lib/db";
 
 const meetingSchema = z.object({
   title: z.string().min(1),

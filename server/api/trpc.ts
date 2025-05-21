@@ -1,10 +1,10 @@
 import { initTRPC } from "@trpc/server";
-import { type CreateNextContextOptions } from "@trpc/server/adapters/next";
+import { type NextRequest } from "next/server";
 import superjson from "superjson";
 import { ZodError } from "zod";
-import { prisma } from "~/lib/db";
+import { prisma } from "@/lib/db";
 
-export const createTRPCContext = async (opts: CreateNextContextOptions) => {
+export const createTRPCContext = async (opts: { req: NextRequest; res: Response }) => {
   const { req, res } = opts;
   return {
     prisma,
