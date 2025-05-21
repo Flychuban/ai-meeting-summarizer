@@ -13,7 +13,7 @@ import { signIn } from "next-auth/react"
 import { useRouter } from "next/navigation"
 import { toast } from "sonner"
 import { signUpSchema } from "@/lib/validations/auth"
-import { api } from "@/trpc/react"
+import { api } from "@/lib/trpc/client"
 
 export function SignUpForm() {
   const [isLoading, setIsLoading] = useState(false)

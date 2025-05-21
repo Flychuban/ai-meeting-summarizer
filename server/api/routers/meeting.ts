@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { createTRPCRouter, publicProcedure } from "../trpc";
 import { safeDbOperation } from "@/lib/db";
+import { authConfig } from "@/lib/auth/config"
 
 const meetingSchema = z.object({
   title: z.string().min(1),
@@ -87,4 +88,26 @@ export const meetingRouter = createTRPCRouter({
         "Failed to delete meeting"
       );
     }),
+
+  getForCurrentUser: publicProcedure.query(async ({ ctx }) => {
+    // Get user from session (NextAuth v5, App Router)
+    const userId = ctx.req?.auth?.user?.id
+    if (!userId) {
+      throw new Error("Not authenticated")
+    }
+    return safeDbOperation(
+      () =>
+        ctx.prisma.meeting.findMany({
+          where: { userId },
+          include: {
+            summary: true,
+            tags: true,
+          },
+          orderBy: {
+            createdAt: "desc",
+          },
+        }),
+      "Failed to fetch user meetings"
+    )
+  }),
 }); 

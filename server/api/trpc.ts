@@ -2,12 +2,12 @@ import { initTRPC } from "@trpc/server";
 import { type NextRequest } from "next/server";
 import superjson from "superjson";
 import { ZodError } from "zod";
-import { prisma } from "@/lib/db";
+import { db } from "@/lib/db";
 
 export const createTRPCContext = async (opts: { req: NextRequest; res: Response }) => {
   const { req, res } = opts;
   return {
-    prisma,
+    prisma: db,
     req,
     res,
   };
