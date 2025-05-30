@@ -33,17 +33,21 @@ export default auth((req) => {
   return NextResponse.next()
 })
 
+// export const config = {
+//   matcher: [
+//     /*
+//      * Match all request paths except for the ones starting with:
+//      * - api/auth (auth API routes)
+//      * - api/trpc (tRPC API routes)
+//      * - _next/static (static files)
+//      * - _next/image (image optimization files)
+//      * - favicon.ico (favicon file)
+//      * - public folder
+//      */
+//     "/((?!api/auth|api/trpc|_next/static|_next/image|favicon.ico|public).*)",
+//   ],
+// }
+
 export const config = {
-  matcher: [
-    /*
-     * Match all request paths except for the ones starting with:
-     * - api/auth (auth API routes)
-     * - api/trpc (tRPC API routes)
-     * - _next/static (static files)
-     * - _next/image (image optimization files)
-     * - favicon.ico (favicon file)
-     * - public folder
-     */
-    "/((?!api/auth|api/trpc|_next/static|_next/image|favicon.ico|public).*)",
-  ],
-}
+  matcher: ["/((?!api|_next/static|_next/image|favicon.ico).*)"],
+} 
