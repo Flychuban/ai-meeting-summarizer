@@ -1,6 +1,7 @@
 import { LoginForm } from "@/components/auth/login-form"
 import type { Metadata } from "next"
 import Link from "next/link"
+import { Suspense } from "react"
 
 export const metadata: Metadata = {
   title: "Login - AI Meeting Summarizer",
@@ -20,7 +21,9 @@ export default function LoginPage() {
           <h1 className="text-2xl font-semibold tracking-tight">Welcome back</h1>
           <p className="text-sm text-gray-500">Enter your credentials to sign in to your account</p>
         </div>
-        <LoginForm />
+        <Suspense fallback={<div>Loading...</div>}>
+          <LoginForm />
+        </Suspense>
         <p className="px-8 text-center text-sm text-gray-500">
           Don&apos;t have an account?{" "}
           <Link href="/auth/sign-up" className="underline underline-offset-4 hover:text-gray-900">
