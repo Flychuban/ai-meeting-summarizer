@@ -1,4 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
+import OpenAI from "openai";
+import { writeFile, unlink } from "fs/promises";
+import path from "path";
+import { randomUUID } from "crypto";
+
+const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
 // Disable Next.js body parser for this route
 export const config = {
@@ -35,16 +41,31 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "File too large." }, { status: 400 });
   }
 
-  // Read file as ArrayBuffer (in-memory)
+  // Convert file to Buffer
   const arrayBuffer = await file.arrayBuffer();
+  const buffer = Buffer.from(arrayBuffer);
 
-  // TODO: Transcription and summarization logic will go here
-  const transcript = "[Stubbed transcript]";
-  const summary = {
-    keyPoints: ["[Stubbed key point 1]", "[Stubbed key point 2]"],
-    decisions: ["[Stubbed decision]"],
-    actionItems: ["[Stubbed action item]"]
-  };
+  // Write to a temp file (required for OpenAI SDK)
+  const tempFileName = `${randomUUID()}.${file.name.split('.').pop() || 'mp3'}`;
+  const tempFilePath = path.join("/tmp", tempFileName);
+  await writeFile(tempFilePath, buffer);
 
-  return NextResponse.json({ transcript, summary }, { status: 200 });
+  try {
+    // Transcribe with OpenAI Whisper
+    const transcription = await openai.audio.transcriptions.create({
+      file: (await import("fs")).createReadStream(tempFilePath),
+      model: "gpt-4o-transcribe",
+      // Optionally: language: "en"
+    });
+
+    // Clean up temp file
+    await unlink(tempFilePath);
+
+    // Return the transcript
+    return NextResponse.json({ transcript: transcription.text }, { status: 200 });
+  } catch (error) {
+    // Clean up temp file on error
+    await unlink(tempFilePath).catch(() => {});
+    return NextResponse.json({ error: "Transcription failed", details: error instanceof Error ? error.message : error }, { status: 500 });
+  }
 } 
