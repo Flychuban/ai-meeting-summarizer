@@ -5,7 +5,14 @@ import type { NextRequest } from "next/server"
 export default auth((req) => {
   const isLoggedIn = !!req.auth
   const isAuthPage = req.nextUrl.pathname.startsWith("/auth")
+  const isApiRoute = req.nextUrl.pathname.startsWith("/api")
 
+  // Allow API routes to pass through
+  if (isApiRoute) {
+    return NextResponse.next()
+  }
+
+  // Handle auth pages
   if (isAuthPage) {
     if (isLoggedIn) {
       return NextResponse.redirect(new URL("/", req.nextUrl))
@@ -19,6 +26,7 @@ export default auth((req) => {
     return NextResponse.next()
   }
 
+  // Redirect unauthenticated users to login
   if (!isLoggedIn) {
     let from = req.nextUrl.pathname
     if (req.nextUrl.search) {
@@ -49,5 +57,14 @@ export default auth((req) => {
 // }
 
 export const config = {
-  matcher: ["/((?!api|_next/static|_next/image|favicon.ico).*)"],
+  matcher: [
+    /*
+     * Match all paths except:
+     * - _next/static (static files)
+     * - _next/image (image optimization files)
+     * - favicon.ico (favicon file)
+     * - public folder
+     */
+    "/((?!_next/static|_next/image|favicon.ico|public).*)",
+  ],
 } 
