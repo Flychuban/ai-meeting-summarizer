@@ -3,6 +3,7 @@ import OpenAI from "openai";
 import { writeFile, unlink } from "fs/promises";
 import path from "path";
 import { randomUUID } from "crypto";
+import { summarizeMeeting } from "@/lib/meetingSummarizer";
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
@@ -55,14 +56,17 @@ export async function POST(req: NextRequest) {
     const transcription = await openai.audio.transcriptions.create({
       file: (await import("fs")).createReadStream(tempFilePath),
       model: "gpt-4o-transcribe",
-      // Optionally: language: "en"
+      language: "en",
     });
 
     // Clean up temp file
     await unlink(tempFilePath);
 
-    // Return the transcript
-    return NextResponse.json({ transcript: transcription.text }, { status: 200 });
+    // Summarize the transcript using Vercel AI SDK
+    const summary = await summarizeMeeting(transcription.text);
+
+    // Return the transcript and summary
+    return NextResponse.json({ transcript: transcription.text, summary }, { status: 200 });
   } catch (error) {
     // Clean up temp file on error
     await unlink(tempFilePath).catch(() => {});
