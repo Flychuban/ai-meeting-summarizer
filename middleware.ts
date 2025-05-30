@@ -8,8 +8,14 @@ export default auth((req) => {
 
   if (isAuthPage) {
     if (isLoggedIn) {
-      return NextResponse.redirect(new URL("/dashboard", req.nextUrl))
+      return NextResponse.redirect(new URL("/", req.nextUrl))
     }
+    return NextResponse.next()
+  }
+
+  // Allow unauthenticated users to access homepage and auth pages
+  const publicPaths = ["/", "/auth/login", "/auth/sign-up"]
+  if (!isLoggedIn && publicPaths.includes(req.nextUrl.pathname)) {
     return NextResponse.next()
   }
 

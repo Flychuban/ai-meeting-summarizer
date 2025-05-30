@@ -1,31 +1,71 @@
+"use client"
+
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { ArrowRight, FileAudio, Clock, CheckCircle } from "lucide-react"
 import Image from "next/image"
+import { useSession, signOut } from "next-auth/react"
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuLabel,
+} from "@/components/ui/dropdown-menu"
+import { LogOut } from "lucide-react"
 
 export default function Home() {
+  const { data: session, status } = useSession()
+  const user = session?.user
+  const initials = (user?.name || user?.email || "U").split(" ").map((n) => n[0]).join("").toUpperCase()
+
   return (
     <div className="flex min-h-screen flex-col">
       {/* Navigation */}
       <header className="border-b bg-white/80 backdrop-blur-sm">
-        <div className="container mx-auto flex h-16 items-center justify-between px-4">
+        <div className="container mx-auto flex h-16 items-center px-4">
           <Link href="/" className="flex items-center gap-2">
             <FileAudio className="h-6 w-6 text-orange-500" />
             <span className="bg-gradient-to-r from-orange-500 to-amber-500 bg-clip-text text-xl font-bold text-transparent">
               AI Meeting Summarizer
             </span>
           </Link>
-          <div className="flex items-center gap-4">
-            <Button asChild variant="ghost" size="sm">
-              <Link href="/auth/login">Sign In</Link>
-            </Button>
-            <Button
-              asChild
-              size="sm"
-              className="bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600"
-            >
-              <Link href="/auth/sign-up">Sign Up</Link>
-            </Button>
+          <div className="flex items-center gap-4 ml-auto">
+            {status === "authenticated" && user ? (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Avatar className="h-10 w-10 border-2 border-orange-100 cursor-pointer">
+                    <AvatarImage src={user.image || undefined} alt={user.name || user.email || "User"} />
+                    <AvatarFallback className="bg-gradient-to-r from-orange-500 to-amber-500 text-white">
+                      {initials}
+                    </AvatarFallback>
+                  </Avatar>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuLabel>{user.name || user.email}</DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem className="text-red-500" onClick={() => signOut({ callbackUrl: "/" })}>
+                    <LogOut className="mr-2 h-4 w-4" />
+                    <span>Log out</span>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            ) : (
+              <>
+                <Button asChild variant="ghost" size="sm">
+                  <Link href="/auth/login">Sign In</Link>
+                </Button>
+                <Button
+                  asChild
+                  size="sm"
+                  className="bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600"
+                >
+                  <Link href="/auth/sign-up">Sign Up</Link>
+                </Button>
+              </>
+            )}
           </div>
         </div>
       </header>
@@ -46,17 +86,30 @@ export default function Home() {
             </p>
           </div>
           <div className="flex flex-col space-y-4 sm:flex-row sm:space-x-4 sm:space-y-0">
-            <Button
-              asChild
-              className="bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 transition-all duration-300 transform hover:scale-105"
-            >
-              <Link href="/auth/sign-up">
-                Get Started <ArrowRight className="ml-2 h-4 w-4" />
-              </Link>
-            </Button>
-            <Button asChild variant="outline" className="transition-all duration-300 hover:bg-orange-50">
-              <Link href="/auth/login">Sign In</Link>
-            </Button>
+            {status === "authenticated" && user ? (
+              <Button
+                asChild
+                className="bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 transition-all duration-300 transform hover:scale-105"
+              >
+                <Link href="/dashboard">
+                  Get Started
+                </Link>
+              </Button>
+            ) : (
+              <>
+                <Button
+                  asChild
+                  className="bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 transition-all duration-300 transform hover:scale-105"
+                >
+                  <Link href="/auth/sign-up">
+                    Get Started <ArrowRight className="ml-2 h-4 w-4" />
+                  </Link>
+                </Button>
+                <Button asChild variant="outline" className="transition-all duration-300 hover:bg-orange-50">
+                  <Link href="/auth/login">Sign In</Link>
+                </Button>
+              </>
+            )}
           </div>
         </div>
         <div className="hidden md:flex justify-center">

@@ -25,7 +25,7 @@ export function SignUpForm() {
         password: form.getValues("password"),
         redirect: false,
       })
-      router.push("/dashboard")
+      router.push("/")
       router.refresh()
     },
     onError: (error) => {
@@ -51,7 +51,7 @@ export function SignUpForm() {
   async function handleGithubSignIn() {
     setIsLoading(true)
     try {
-      await signIn("github", { callbackUrl: "/dashboard" })
+      await signIn("github", { callbackUrl: "/" })
     } catch (error) {
       toast.error("Something went wrong")
     } finally {
