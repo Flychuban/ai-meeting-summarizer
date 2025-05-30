@@ -3,7 +3,8 @@ import OpenAI from "openai";
 import { writeFile, unlink } from "fs/promises";
 import path from "path";
 import { randomUUID } from "crypto";
-import { summarizeMeeting } from "@/lib/meetingSummarizer";
+import { summarizeMeeting } from "@/lib/services/meetingSummarizer";
+import { transcribeAudio } from "@/lib/services/transcription";
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
@@ -52,24 +53,17 @@ export async function POST(req: NextRequest) {
   await writeFile(tempFilePath, buffer);
 
   try {
-    // Transcribe with OpenAI Whisper
-    const transcription = await openai.audio.transcriptions.create({
-      file: (await import("fs")).createReadStream(tempFilePath),
-      model: "gpt-4o-transcribe",
-      language: "en",
-    });
-
-    // Clean up temp file
-    await unlink(tempFilePath);
+    // Transcribe using the service
+    const transcript = await transcribeAudio(file);
 
     // Summarize the transcript using Vercel AI SDK
-    const summary = await summarizeMeeting(transcription.text);
+    const summary = await summarizeMeeting(transcript);
 
     // Return the transcript and summary
-    return NextResponse.json({ transcript: transcription.text, summary }, { status: 200 });
+    return NextResponse.json({ transcript, summary }, { status: 200 });
   } catch (error) {
     // Clean up temp file on error
     await unlink(tempFilePath).catch(() => {});
-    return NextResponse.json({ error: "Transcription failed", details: error instanceof Error ? error.message : error }, { status: 500 });
+    return NextResponse.json({ error: "Transcription or summarization failed", details: error instanceof Error ? error.message : error }, { status: 500 });
   }
 } 
