@@ -3,6 +3,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
+import { Card, CardHeader, CardContent, CardFooter, CardTitle, CardDescription } from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
 import { format } from "date-fns";
 
 export interface MeetingEditFormProps {
@@ -61,69 +63,96 @@ export const MeetingEditForm: React.FC<MeetingEditFormProps> = ({ initialData, o
   };
 
   return (
-    <form className="space-y-6" onSubmit={handleSubmit}>
-      <div>
-        <Label>Title</Label>
-        <Input value={title} onChange={e => setTitle(e.target.value)} required />
-      </div>
-      <div>
-        <Label>Date</Label>
-        <Input type="date" value={date} onChange={e => setDate(e.target.value)} required />
-      </div>
-      <div>
-        <Label>Transcript</Label>
-        <Textarea value={transcript} onChange={e => setTranscript(e.target.value)} rows={6} required />
-      </div>
-      <div>
-        <Label>Key Points</Label>
-        {keyPoints.map((point, idx) => (
-          <div key={idx} className="flex gap-2 mb-2">
-            <Input value={point} onChange={e => handleListChange(setKeyPoints, idx, e.target.value)} />
-            <Button type="button" variant="destructive" onClick={() => handleListRemove(setKeyPoints, idx)}>-</Button>
+    <Card className="max-w-2xl mx-auto shadow-lg border-orange-200">
+      <form onSubmit={handleSubmit}>
+        <CardHeader className="bg-gradient-to-r from-orange-400 via-orange-500 to-amber-400 rounded-t-md p-6">
+          <CardTitle className="text-white text-2xl font-bold">Review & Edit Meeting Summary</CardTitle>
+          <CardDescription className="text-orange-50 mt-2">Edit the AI-generated summary and details before saving your meeting.</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-6 p-6 bg-white">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <Label>Title</Label>
+              <Input value={title} onChange={e => setTitle(e.target.value)} required className="mt-1" />
+            </div>
+            <div>
+              <Label>Date</Label>
+              <Input type="date" value={date} onChange={e => setDate(e.target.value)} required className="mt-1" />
+            </div>
           </div>
-        ))}
-        <Button type="button" variant="secondary" onClick={() => handleListAdd(setKeyPoints)}>Add Key Point</Button>
-      </div>
-      <div>
-        <Label>Action Items</Label>
-        {actionItems.map((item, idx) => (
-          <div key={idx} className="flex gap-2 mb-2">
-            <Input value={item} onChange={e => handleListChange(setActionItems, idx, e.target.value)} />
-            <Button type="button" variant="destructive" onClick={() => handleListRemove(setActionItems, idx)}>-</Button>
+          <Separator />
+          <div>
+            <Label>Transcript</Label>
+            <Textarea value={transcript} onChange={e => setTranscript(e.target.value)} rows={6} required className="mt-1" />
           </div>
-        ))}
-        <Button type="button" variant="secondary" onClick={() => handleListAdd(setActionItems)}>Add Action Item</Button>
-      </div>
-      <div>
-        <Label>Decisions</Label>
-        {decisions.map((item, idx) => (
-          <div key={idx} className="flex gap-2 mb-2">
-            <Input value={item} onChange={e => handleListChange(setDecisions, idx, e.target.value)} />
-            <Button type="button" variant="destructive" onClick={() => handleListRemove(setDecisions, idx)}>-</Button>
+          <Separator />
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div>
+              <Label>Key Points</Label>
+              <div className="space-y-2 mt-2">
+                {keyPoints.map((point, idx) => (
+                  <div key={idx} className="flex gap-2">
+                    <Input value={point} onChange={e => handleListChange(setKeyPoints, idx, e.target.value)} />
+                    <Button type="button" size="icon" variant="destructive" onClick={() => handleListRemove(setKeyPoints, idx)}>-</Button>
+                  </div>
+                ))}
+                <Button type="button" variant="secondary" size="sm" className="mt-2" onClick={() => handleListAdd(setKeyPoints)}>Add Key Point</Button>
+              </div>
+            </div>
+            <div>
+              <Label>Action Items</Label>
+              <div className="space-y-2 mt-2">
+                {actionItems.map((item, idx) => (
+                  <div key={idx} className="flex gap-2">
+                    <Input value={item} onChange={e => handleListChange(setActionItems, idx, e.target.value)} />
+                    <Button type="button" size="icon" variant="destructive" onClick={() => handleListRemove(setActionItems, idx)}>-</Button>
+                  </div>
+                ))}
+                <Button type="button" variant="secondary" size="sm" className="mt-2" onClick={() => handleListAdd(setActionItems)}>Add Action Item</Button>
+              </div>
+            </div>
+            <div>
+              <Label>Decisions</Label>
+              <div className="space-y-2 mt-2">
+                {decisions.map((item, idx) => (
+                  <div key={idx} className="flex gap-2">
+                    <Input value={item} onChange={e => handleListChange(setDecisions, idx, e.target.value)} />
+                    <Button type="button" size="icon" variant="destructive" onClick={() => handleListRemove(setDecisions, idx)}>-</Button>
+                  </div>
+                ))}
+                <Button type="button" variant="secondary" size="sm" className="mt-2" onClick={() => handleListAdd(setDecisions)}>Add Decision</Button>
+              </div>
+            </div>
           </div>
-        ))}
-        <Button type="button" variant="secondary" onClick={() => handleListAdd(setDecisions)}>Add Decision</Button>
-      </div>
-      <div>
-        <Label>Tags</Label>
-        <Input
-          value={tags.join(", ")}
-          onChange={e => setTags(e.target.value.split(",").map(t => t.trim()).filter(Boolean))}
-          placeholder="Comma separated tags"
-        />
-      </div>
-      <div>
-        <Label>Participants</Label>
-        <Input
-          value={participants.join(", ")}
-          onChange={e => setParticipants(e.target.value.split(",").map(t => t.trim()).filter(Boolean))}
-          placeholder="Comma separated participants"
-        />
-      </div>
-      <div className="flex gap-4">
-        <Button type="submit" disabled={saving}>{saving ? "Saving..." : "Save Meeting"}</Button>
-        {onCancel && <Button type="button" variant="secondary" onClick={onCancel}>Cancel</Button>}
-      </div>
-    </form>
+          <Separator />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <Label>Tags</Label>
+              <Input
+                value={tags.join(", ")}
+                onChange={e => setTags(e.target.value.split(",").map(t => t.trim()).filter(Boolean))}
+                placeholder="Comma separated tags"
+                className="mt-1"
+              />
+            </div>
+            <div>
+              <Label>Participants</Label>
+              <Input
+                value={participants.join(", ")}
+                onChange={e => setParticipants(e.target.value.split(",").map(t => t.trim()).filter(Boolean))}
+                placeholder="Comma separated participants"
+                className="mt-1"
+              />
+            </div>
+          </div>
+        </CardContent>
+        <CardFooter className="flex gap-4 justify-end bg-gray-50 p-6 rounded-b-md border-t">
+          <Button type="submit" disabled={saving} className="bg-gradient-to-r from-orange-500 to-amber-500 text-white font-semibold shadow-md">
+            {saving ? "Saving..." : "Save Meeting"}
+          </Button>
+          {onCancel && <Button type="button" variant="secondary" onClick={onCancel}>Cancel</Button>}
+        </CardFooter>
+      </form>
+    </Card>
   );
 }; 
