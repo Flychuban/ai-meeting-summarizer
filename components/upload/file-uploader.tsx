@@ -2,6 +2,7 @@
 
 import type React from "react"
 import Link from "next/link"
+import { useRouter } from "next/navigation"
 
 import { useState, useRef } from "react"
 import { Button } from "@/components/ui/button"
@@ -9,6 +10,8 @@ import { Progress } from "@/components/ui/progress"
 import { Card, CardContent } from "@/components/ui/card"
 import { FileAudio, Upload, Check, Trash2, AlertCircle } from "lucide-react"
 import { motion, AnimatePresence } from "framer-motion"
+import { MeetingEditForm } from "@/components/MeetingEditForm"
+import { api } from "@/lib/trpc/client"
 
 export function FileUploader() {
   const [file, setFile] = useState<File | null>(null)
@@ -17,7 +20,11 @@ export function FileUploader() {
   const [isUploading, setIsUploading] = useState(false)
   const [isComplete, setIsComplete] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [aiData, setAiData] = useState<any | null>(null)
+  const [editMode, setEditMode] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const router = useRouter()
+  const createMeeting = api.meeting.create.useMutation()
 
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault()
@@ -71,24 +78,55 @@ export function FileUploader() {
     }
   }
 
-  const handleUpload = () => {
+  const handleUpload = async () => {
     if (!file) return
-
     setIsUploading(true)
     setError(null)
-
-    // Simulate upload progress
-    let progress = 0
-    const interval = setInterval(() => {
-      progress += 5
-      setUploadProgress(progress)
-
-      if (progress >= 100) {
-        clearInterval(interval)
+    setUploadProgress(0)
+    try {
+      const formData = new FormData()
+      formData.append("audioFile", file)
+      const res = await fetch("/api/upload", {
+        method: "POST",
+        body: formData,
+      })
+      if (!res.ok) {
+        const err = await res.json()
+        setError(err.error || "Upload failed")
         setIsUploading(false)
-        setIsComplete(true)
+        return
       }
-    }, 200)
+      const data = await res.json()
+      setAiData({
+        transcript: data.transcript,
+        summary: data.summary,
+        title: file.name.replace(/\.[^/.]+$/, ""),
+        date: new Date().toISOString().slice(0, 10),
+        tags: [],
+        participants: [],
+      })
+      setEditMode(true)
+      setIsUploading(false)
+      setIsComplete(true)
+    } catch (err: any) {
+      setError(err.message || "Upload failed")
+      setIsUploading(false)
+    }
+  }
+
+  const handleSaveMeeting = async (formData: any) => {
+    try {
+      await createMeeting.mutateAsync({
+        ...formData,
+        audioUrl: "", // You can store the file name or a placeholder if needed
+        duration: 300, // Placeholder, replace with actual duration if available
+        fileSize: file?.size || 0,
+        status: "completed",
+      })
+      router.push("/dashboard")
+    } catch (err: any) {
+      setError(err.message || "Failed to save meeting")
+    }
   }
 
   const formatFileSize = (bytes: number) => {
@@ -103,6 +141,23 @@ export function FileUploader() {
     const minutes = Math.floor(seconds / 60)
     const remainingSeconds = Math.floor(seconds % 60)
     return `${minutes}:${remainingSeconds.toString().padStart(2, "0")}`
+  }
+
+  if (aiData && editMode) {
+    return (
+      <div className="mt-8">
+        <MeetingEditForm
+          initialData={aiData}
+          onSave={handleSaveMeeting}
+          onCancel={() => {
+            setAiData(null)
+            setEditMode(false)
+            setFile(null)
+            setIsComplete(false)
+          }}
+        />
+      </div>
+    )
   }
 
   return (
