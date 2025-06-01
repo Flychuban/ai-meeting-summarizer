@@ -116,13 +116,26 @@ export function FileUploader() {
 
   const handleSaveMeeting = async (formData: any) => {
     try {
-      await createMeeting.mutateAsync({
-        ...formData,
-        audioUrl: "", // You can store the file name or a placeholder if needed
-        duration: 300, // Placeholder, replace with actual duration if available
+      // Ensure audioUrl is a valid absolute URL
+      const baseUrl = typeof window !== "undefined" ? window.location.origin : "http://localhost:3000";
+      const audioUrl = file ? `${baseUrl}/uploads/${file.name}` : `${baseUrl}/uploads/placeholder.mp3`;
+      const payload = {
+        title: formData.title || file?.name.replace(/\.[^/.]+$/, "") || "Untitled Meeting",
+        audioUrl: audioUrl,
+        duration: 300,
         fileSize: file?.size || 0,
-        status: "completed",
-      })
+        status: "completed" as const,
+        date: formData.date ? new Date(formData.date).toISOString() : new Date().toISOString(),
+        tags: Array.isArray(formData.tags) ? formData.tags.map(String) : (typeof formData.tags === "string" ? formData.tags.split(",").map((t: string) => t.trim()).filter(Boolean) : []),
+        participants: Array.isArray(formData.participants) ? formData.participants.map(String) : (typeof formData.participants === "string" ? formData.participants.split(",").map((t: string) => t.trim()).filter(Boolean) : []),
+        summary: {
+          transcript: formData.transcript || "",
+          keyPoints: Array.isArray(formData.summary?.keyPoints) ? formData.summary.keyPoints.map(String) : [],
+          decisions: Array.isArray(formData.summary?.decisions) ? formData.summary.decisions.map(String) : [],
+          actionItems: Array.isArray(formData.summary?.actionItems) ? formData.summary.actionItems.map(String) : [],
+        },
+      }
+      await createMeeting.mutateAsync(payload)
       router.push("/dashboard")
     } catch (err: any) {
       setError(err.message || "Failed to save meeting")
