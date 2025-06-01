@@ -6,7 +6,6 @@ type ExportableMeeting = {
   duration?: string | number
   summary?: {
     keyPoints?: string[]
-    actionItems?: any[]
     decisions?: string[]
     transcript?: string
   }
@@ -24,9 +23,6 @@ Duration: ${meeting.duration || ""}
 
 ## Key Points
 ${meeting.summary?.keyPoints?.map((point) => `- ${point}`).join("\n") || ""}
-
-## Action Items
-${meeting.summary?.actionItems?.map((item) => `- ${typeof item === "string" ? item : (item?.task ? `${item.assignee}: ${item.task} (Due: ${item.dueDate})` : "")}`).join("\n") || ""}
 
 ## Decisions
 ${meeting.summary?.decisions?.map((decision) => `- ${decision}`).join("\n") || ""}

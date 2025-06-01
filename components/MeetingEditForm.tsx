@@ -31,7 +31,6 @@ export const MeetingEditForm: React.FC<MeetingEditFormProps> = ({ initialData, o
   );
   const [transcript, setTranscript] = useState(initialData.transcript);
   const [keyPoints, setKeyPoints] = useState(initialData.summary.keyPoints);
-  const [actionItems, setActionItems] = useState(initialData.summary.actionItems);
   const [decisions, setDecisions] = useState(initialData.summary.decisions);
   const [tags, setTags] = useState(initialData.tags || []);
   const [participants, setParticipants] = useState(initialData.participants || []);
@@ -55,7 +54,7 @@ export const MeetingEditForm: React.FC<MeetingEditFormProps> = ({ initialData, o
       title,
       date,
       transcript,
-      summary: { keyPoints, actionItems, decisions },
+      summary: { keyPoints, decisions },
       tags,
       participants,
     });
@@ -86,7 +85,7 @@ export const MeetingEditForm: React.FC<MeetingEditFormProps> = ({ initialData, o
             <Textarea value={transcript} onChange={e => setTranscript(e.target.value)} rows={6} required className="mt-1" />
           </div>
           <Separator />
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
               <Label>Key Points</Label>
               <div className="space-y-2 mt-2">
@@ -97,18 +96,6 @@ export const MeetingEditForm: React.FC<MeetingEditFormProps> = ({ initialData, o
                   </div>
                 ))}
                 <Button type="button" variant="secondary" size="sm" className="mt-2" onClick={() => handleListAdd(setKeyPoints)}>Add Key Point</Button>
-              </div>
-            </div>
-            <div>
-              <Label>Action Items</Label>
-              <div className="space-y-2 mt-2">
-                {actionItems.map((item, idx) => (
-                  <div key={idx} className="flex gap-2">
-                    <Input value={item} onChange={e => handleListChange(setActionItems, idx, e.target.value)} />
-                    <Button type="button" size="icon" variant="destructive" onClick={() => handleListRemove(setActionItems, idx)}>-</Button>
-                  </div>
-                ))}
-                <Button type="button" variant="secondary" size="sm" className="mt-2" onClick={() => handleListAdd(setActionItems)}>Add Action Item</Button>
               </div>
             </div>
             <div>

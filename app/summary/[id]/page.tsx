@@ -43,7 +43,11 @@ export default function MeetingDetailPage() {
     date: (meeting as any).date || meeting.createdAt,
     tags: Array.isArray((meeting as any).tags) ? (meeting as any).tags.map((tag: any) => tag.name) : [],
     participants: Array.isArray((meeting as any).participants) ? (meeting as any).participants.map((p: any) => p.name) : [],
-    summary: (meeting as any).summary || { keyPoints: [], actionItems: [], decisions: [], transcript: "" },
+    summary: {
+      keyPoints: (meeting as any).summary?.keyPoints || [],
+      decisions: (meeting as any).summary?.decisions || [],
+      transcript: (meeting as any).summary?.transcript || "",
+    },
     transcript: (meeting as any).summary?.transcript || "",
     duration: typeof meeting.duration === "number" ? `${Math.round(meeting.duration / 60)} minutes` : meeting.duration,
   } as any

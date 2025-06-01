@@ -80,15 +80,14 @@ model Participant {
 }
 
 model Summary {
-  id          String   @id @default(cuid())
-  meetingId   String   @unique
-  meeting     Meeting  @relation(fields: [meetingId], references: [id], onDelete: Cascade)
-  transcript  String   @db.Text
-  keyPoints   String[] // Array of key points
-  decisions   String[] // Array of decisions made
-  actionItems String[] // Array of action items
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id         String   @id @default(cuid())
+  meetingId  String   @unique
+  meeting    Meeting  @relation(fields: [meetingId], references: [id], onDelete: Cascade)
+  transcript String   @db.Text
+  keyPoints  String[] // Array of key points
+  decisions  String[] // Array of decisions made
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
 }
 
 model Tag {

@@ -7,7 +7,6 @@ const summarySchema = z.object({
   transcript: z.string(),
   keyPoints: z.array(z.string()),
   decisions: z.array(z.string()),
-  actionItems: z.array(z.string()),
 });
 
 const meetingSchema = z.object({
@@ -57,7 +56,6 @@ export const meetingRouter = createTRPCRouter({
                   transcript: input.summary.transcript,
                   keyPoints: input.summary.keyPoints,
                   decisions: input.summary.decisions,
-                  actionItems: input.summary.actionItems,
                 },
               },
             },

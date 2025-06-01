@@ -27,7 +27,6 @@ interface Summary {
   participants?: string[]
   summary: {
     keyPoints: string[]
-    actionItems: ActionItem[]
     decisions: string[]
   }
 }
@@ -64,9 +63,6 @@ Duration: ${summary.duration}
 
 ## Key Points
 ${summary.summary.keyPoints.map((point) => `- ${point}`).join("\n")}
-
-## Action Items
-${summary.summary.actionItems.map((item) => `- ${item.assignee}: ${item.task} (Due: ${item.dueDate})`).join("\n")}
 
 ## Decisions
 ${summary.summary.decisions.map((decision) => `- ${decision}`).join("\n")}
@@ -210,53 +206,6 @@ ${summary.summary.decisions.map((decision) => `- ${decision}`).join("\n")}
                   <CardTitle className="flex items-center text-white font-semibold text-lg">
                     <span className="mr-2 flex h-6 w-6 items-center justify-center rounded-full bg-white/30 text-xs font-medium text-white">
                       2
-                    </span>
-                    Action Items
-                  </CardTitle>
-                </div>
-              </CardHeader>
-              <CardContent className="pt-6">
-                <ul className="space-y-4">
-                  {summary.summary.actionItems.map((item, index) => (
-                    <motion.li
-                      key={index}
-                      className="flex items-start"
-                      initial={{ opacity: 0, x: -10 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ duration: 0.2, delay: index * 0.1 }}
-                    >
-                      <span className="mr-2 flex h-6 w-6 items-center justify-center rounded-full bg-orange-100 text-xs font-medium text-orange-600">
-                        {index + 1}
-                      </span>
-                      <div>
-                        <p>{item.task}</p>
-                        <div className="mt-1 flex items-center gap-2">
-                          <Badge variant="outline" className="text-xs bg-orange-50 text-orange-600 hover:bg-orange-100">
-                            {item.assignee}
-                          </Badge>
-                          <span className="text-xs text-gray-500">
-                            Due: {new Date(item.dueDate).toLocaleDateString()}
-                          </span>
-                        </div>
-                      </div>
-                    </motion.li>
-                  ))}
-                </ul>
-              </CardContent>
-            </Card>
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.3, delay: 0.2 }}
-          >
-            <Card>
-              <CardHeader className="p-0 overflow-hidden">
-                <div className="w-full h-10 flex items-center rounded-t-md bg-gradient-to-r from-orange-400 via-orange-500 to-amber-400 px-4">
-                  <CardTitle className="flex items-center text-white font-semibold text-lg">
-                    <span className="mr-2 flex h-6 w-6 items-center justify-center rounded-full bg-white/30 text-xs font-medium text-white">
-                      3
                     </span>
                     Decisions
                   </CardTitle>

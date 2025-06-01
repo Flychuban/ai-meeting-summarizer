@@ -4,7 +4,6 @@ import { z } from 'zod';
 
 export const meetingSummarySchema = z.object({
   keyPoints: z.array(z.string()),
-  actionItems: z.array(z.string()),
   decisions: z.array(z.string()),
 });
 

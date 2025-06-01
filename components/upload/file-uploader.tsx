@@ -132,7 +132,6 @@ export function FileUploader() {
           transcript: formData.transcript || "",
           keyPoints: Array.isArray(formData.summary?.keyPoints) ? formData.summary.keyPoints.map(String) : [],
           decisions: Array.isArray(formData.summary?.decisions) ? formData.summary.decisions.map(String) : [],
-          actionItems: Array.isArray(formData.summary?.actionItems) ? formData.summary.actionItems.map(String) : [],
         },
       }
       await createMeeting.mutateAsync(payload)
