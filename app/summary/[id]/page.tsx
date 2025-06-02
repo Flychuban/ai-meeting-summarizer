@@ -27,7 +27,16 @@ export default function MeetingDetailPage() {
 
   const handleSave = async (data: any) => {
     try {
-      await updateMeeting.mutateAsync({ id: meetingId, data })
+      // Ensure summary is always present and transcript is inside summary
+      const payload = {
+        ...data,
+        summary: {
+          transcript: data.summary?.transcript || "",
+          keyPoints: data.summary?.keyPoints || [],
+          decisions: data.summary?.decisions || [],
+        },
+      }
+      await updateMeeting.mutateAsync({ id: meetingId, data: payload })
     } catch (error) {
       console.error("Failed to update meeting:", error)
     }
@@ -36,21 +45,6 @@ export default function MeetingDetailPage() {
   if (isLoading) return <div className="flex justify-center py-12 text-lg text-gray-500">Loading...</div>
   if (isError) return <div className="flex justify-center py-12 text-lg text-red-500">Failed to load meeting.</div>
   if (!meeting) return <div className="flex justify-center py-12 text-lg text-red-500">Meeting not found.</div>
-
-  // Shape meeting data for UI components
-  const hydratedMeeting = {
-    ...meeting,
-    date: (meeting as any).date || meeting.createdAt,
-    tags: Array.isArray((meeting as any).tags) ? (meeting as any).tags.map((tag: any) => tag.name) : [],
-    participants: Array.isArray((meeting as any).participants) ? (meeting as any).participants.map((p: any) => p.name) : [],
-    summary: {
-      keyPoints: (meeting as any).summary?.keyPoints || [],
-      decisions: (meeting as any).summary?.decisions || [],
-      transcript: (meeting as any).summary?.transcript || "",
-    },
-    transcript: (meeting as any).summary?.transcript || "",
-    duration: typeof meeting.duration === "number" ? `${Math.round(meeting.duration / 60)} minutes` : meeting.duration,
-  } as any
 
   const handleExport = async (format: "json" | "markdown" | "pdf") => {
     if (!meeting) return
@@ -103,33 +97,62 @@ export default function MeetingDetailPage() {
     <ProtectedRoute>
       <div className="container py-8">
         {isEditing ? (
-          <MeetingEditForm
-            initialData={hydratedMeeting}
-            onSave={handleSave}
-            onCancel={() => setIsEditing(false)}
-          />
+          (() => {
+            const m: any = meeting || {}
+            const hydratedMeeting = {
+              ...m,
+              transcript: m.summary?.transcript || "",
+              date: m.date || m.createdAt || new Date().toISOString(),
+              tags: Array.isArray(m.tags) ? m.tags.map((tag: any) => tag.name) : [],
+              participants: Array.isArray(m.participants) ? m.participants.map((p: any) => p.name) : [],
+              summary: {
+                keyPoints: m.summary?.keyPoints || [],
+                decisions: m.summary?.decisions || [],
+                transcript: m.summary?.transcript || "",
+              },
+              duration: typeof m.duration === "number" ? `${Math.round(m.duration / 60)} minutes` : m.duration || "",
+            }
+            return (
+              <MeetingEditForm
+                initialData={hydratedMeeting as any}
+                onSave={handleSave}
+                onCancel={() => setIsEditing(false)}
+              />
+            )
+          })()
         ) : (
-          <div className="space-y-6">
-            <div className="flex justify-between items-center">
-              <h1 className="text-3xl font-bold">{hydratedMeeting.title}</h1>
-              <div className="flex gap-2">
-                <Button onClick={() => setIsEditing(true)}>Edit</Button>
-                <Button onClick={() => handleExport("json")}>
-                  <FileJson className="mr-2 h-4 w-4" />
-                  JSON
-                </Button>
-                <Button onClick={() => handleExport("markdown")}>
-                  <FileText className="mr-2 h-4 w-4" />
-                  Markdown
-                </Button>
-                <Button onClick={() => handleExport("pdf")}>
-                  <Download className="mr-2 h-4 w-4" />
-                  PDF
-                </Button>
+          (() => {
+            const m: any = meeting || {}
+            const hydratedMeeting = {
+              ...m,
+              transcript: m.summary?.transcript || "",
+              date: m.date || m.createdAt || new Date().toISOString(),
+              tags: Array.isArray(m.tags) ? m.tags.map((tag: any) => tag.name) : [],
+              participants: Array.isArray(m.participants) ? m.participants.map((p: any) => p.name) : [],
+              summary: {
+                keyPoints: m.summary?.keyPoints || [],
+                decisions: m.summary?.decisions || [],
+                transcript: m.summary?.transcript || "",
+              },
+              duration: typeof m.duration === "number" ? `${Math.round(m.duration / 60)} minutes` : m.duration || "",
+            }
+            return (
+              <div className="space-y-6">
+                <div className="flex justify-between items-center">
+                  <h1 className="text-2xl font-bold">{hydratedMeeting.title}</h1>
+                  <div className="flex gap-2">
+                    <Button variant="outline" onClick={() => setIsEditing(true)}>
+                      Edit
+                    </Button>
+                    <Button variant="outline" onClick={() => handleExport("json")}>JSON</Button>
+                    <Button variant="outline" onClick={() => handleExport("markdown")}>Markdown</Button>
+                    <Button variant="outline" onClick={() => handleExport("pdf")}>PDF</Button>
+                  </div>
+                </div>
+                <SummaryViewer summary={hydratedMeeting as any} />
               </div>
-            </div>
-            <SummaryViewer summary={hydratedMeeting} />
-          </div>
+            )
+          })()
         )}
       </div>
     </ProtectedRoute>

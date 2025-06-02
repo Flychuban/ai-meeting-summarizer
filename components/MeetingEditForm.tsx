@@ -53,8 +53,7 @@ export const MeetingEditForm: React.FC<MeetingEditFormProps> = ({ initialData, o
     await onSave({
       title,
       date,
-      transcript,
-      summary: { keyPoints, decisions },
+      summary: { transcript, keyPoints, decisions },
       tags,
       participants,
     });
@@ -92,7 +91,7 @@ export const MeetingEditForm: React.FC<MeetingEditFormProps> = ({ initialData, o
                 {keyPoints.map((point, idx) => (
                   <div key={idx} className="flex gap-2">
                     <Input value={point} onChange={e => handleListChange(setKeyPoints, idx, e.target.value)} />
-                    <Button type="button" size="icon" variant="destructive" onClick={() => handleListRemove(setKeyPoints, idx)}>-</Button>
+                    <Button type="button" variant="destructive" onClick={() => handleListRemove(setKeyPoints, idx)}>-</Button>
                   </div>
                 ))}
                 <Button type="button" variant="secondary" size="sm" className="mt-2" onClick={() => handleListAdd(setKeyPoints)}>Add Key Point</Button>
