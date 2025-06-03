@@ -11,6 +11,7 @@ import { JsonViewer } from "@/components/summary/json-viewer"
 import Link from "next/link"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { motion } from "framer-motion"
+import { api } from "@/lib/trpc/client"
 
 interface ActionItem {
   assignee: string
@@ -38,6 +39,13 @@ interface SummaryViewerProps {
 export function SummaryViewer({ summary }: SummaryViewerProps) {
   const [tags, setTags] = useState<string[]>(summary.tags)
   const [copied, setCopied] = useState(false)
+  const [tagLoading, setTagLoading] = useState(false)
+  const utils = api.useUtils()
+  const updateMeeting = api.meeting.update.useMutation({
+    onSuccess: () => {
+      utils.meeting.getById.invalidate(summary.id)
+    },
+  })
 
   const formattedDate = new Date(summary.date).toLocaleDateString("en-US", {
     year: "numeric",
@@ -45,14 +53,34 @@ export function SummaryViewer({ summary }: SummaryViewerProps) {
     day: "numeric",
   })
 
-  const handleAddTag = (tag: string) => {
+  const handleAddTag = async (tag: string) => {
     if (tag && !tags.includes(tag)) {
-      setTags([...tags, tag])
+      setTagLoading(true)
+      try {
+        const newTags = [...tags, tag]
+        await updateMeeting.mutateAsync({ id: summary.id, data: { tags: newTags } })
+        setTags(newTags)
+      } catch (e) {
+        // Optionally show error
+      } finally {
+        setTagLoading(false)
+      }
     }
   }
 
-  const handleRemoveTag = (tag: string) => {
-    setTags(tags.filter((t) => t !== tag))
+  const handleRemoveTag = async (tag: string) => {
+    if (tags.includes(tag)) {
+      setTagLoading(true)
+      try {
+        const newTags = tags.filter((t) => t !== tag)
+        await updateMeeting.mutateAsync({ id: summary.id, data: { tags: newTags } })
+        setTags(newTags)
+      } catch (e) {
+        // Optionally show error
+      } finally {
+        setTagLoading(false)
+      }
+    }
   }
 
   const handleCopyToClipboard = () => {
@@ -151,6 +179,9 @@ ${summary.summary.decisions.map((decision) => `- ${decision}`).join("\n")}
       )}
 
       <SummaryTags tags={tags} onAddTag={handleAddTag} onRemoveTag={handleRemoveTag} />
+      {tagLoading && (
+        <div className="text-xs text-gray-400 mt-2">Updating tags...</div>
+      )}
 
       <Tabs defaultValue="summary" className="mt-6">
         <TabsList className="bg-orange-50">
