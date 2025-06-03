@@ -100,7 +100,10 @@ export function FileUploader() {
       const data = await res.json()
       setDuration(data.duration || null)
       setAiData({
-        summary: data.summary,
+        summary: {
+          ...data.summary,
+          transcript: data.transcript || "",
+        },
         title: data.summary?.title || file.name.replace(/\.[^/.]+$/, ""),
         date: new Date().toISOString().slice(0, 10),
         tags: data.summary?.tags || [],
@@ -133,6 +136,7 @@ export function FileUploader() {
         summary: {
           keyPoints: Array.isArray(formData.summary?.keyPoints) ? formData.summary.keyPoints.map(String) : [],
           decisions: Array.isArray(formData.summary?.decisions) ? formData.summary.decisions.map(String) : [],
+          transcript: formData.summary?.transcript || "",
         },
       }
       await createMeeting.mutateAsync(payload)

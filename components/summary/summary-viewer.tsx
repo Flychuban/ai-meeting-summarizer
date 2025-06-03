@@ -29,6 +29,7 @@ interface Summary {
   summary: {
     keyPoints: string[]
     decisions: string[]
+    transcript?: string
   }
 }
 
@@ -50,6 +51,7 @@ export function SummaryViewer({ summary, onEdit, onExport, isAuthenticated, onDe
     },
   })
   const [showDeleteDialog, setShowDeleteDialog] = useState(false)
+  const [showTranscript, setShowTranscript] = useState(false)
 
   const formattedDate = new Date(summary.date).toLocaleDateString("en-US", {
     year: "numeric",
@@ -182,13 +184,25 @@ export function SummaryViewer({ summary, onEdit, onExport, isAuthenticated, onDe
       )}
 
       <Tabs defaultValue="summary" className="mt-6">
-        <TabsList className="bg-orange-50">
+        <TabsList className="bg-orange-50 flex items-center gap-2">
           <TabsTrigger value="summary" className="data-[state=active]:bg-white">
             Summary
           </TabsTrigger>
           <TabsTrigger value="json" className="data-[state=active]:bg-white">
             JSON View
           </TabsTrigger>
+          {summary.summary.transcript && summary.summary.transcript.length > 0 && (
+            <Button
+              variant="outline"
+              size="sm"
+              className="ml-2 text-orange-600 border-orange-200 hover:bg-orange-50"
+              onClick={() => setShowTranscript(true)}
+              aria-label="View Transcript"
+              type="button"
+            >
+              View Transcript
+            </Button>
+          )}
         </TabsList>
         <TabsContent value="summary" className="space-y-6">
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }}>
@@ -294,6 +308,37 @@ export function SummaryViewer({ summary, onEdit, onExport, isAuthenticated, onDe
               </Button>
             </div>
           </Card>
+        </div>
+      )}
+
+      {showTranscript && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 animate-fade-in">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95, y: 30 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.95, y: 30 }}
+            transition={{ duration: 0.25 }}
+            className="w-full max-w-2xl"
+          >
+            <Card className="shadow-xl animate-in fade-in zoom-in">
+              <CardHeader className="flex flex-row items-center justify-between pb-2">
+                <CardTitle className="text-lg flex items-center gap-2">
+                  <span className="inline-block h-6 w-6 rounded-full bg-gradient-to-r from-orange-400 to-amber-400 text-white flex items-center justify-center text-xs font-bold">T</span>
+                  Transcript
+                </CardTitle>
+                <Button variant="ghost" size="icon" aria-label="Close transcript" onClick={() => setShowTranscript(false)}>
+                  <svg className="h-5 w-5 text-gray-500" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
+                </Button>
+              </CardHeader>
+              <CardContent className="pt-0 pb-4">
+                <div className="max-h-[60vh] overflow-y-auto p-2 rounded bg-orange-50 border border-orange-100">
+                  <pre className="whitespace-pre-wrap text-sm text-gray-800 font-mono leading-relaxed">
+                    {summary.summary.transcript}
+                  </pre>
+                </div>
+              </CardContent>
+            </Card>
+          </motion.div>
         </div>
       )}
     </div>

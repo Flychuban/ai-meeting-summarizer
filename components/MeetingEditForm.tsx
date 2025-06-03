@@ -15,6 +15,7 @@ export interface MeetingEditFormProps {
       keyPoints: string[];
       actionItems: string[];
       decisions: string[];
+      transcript?: string;
     };
     tags?: string[];
     participants?: string[];
@@ -30,6 +31,7 @@ export const MeetingEditForm: React.FC<MeetingEditFormProps> = ({ initialData, o
   );
   const [keyPoints, setKeyPoints] = useState(initialData.summary.keyPoints);
   const [decisions, setDecisions] = useState(initialData.summary.decisions);
+  const [transcript, setTranscript] = useState(initialData.summary.transcript || "");
   const [tags, setTags] = useState(initialData.tags || []);
   const [participants, setParticipants] = useState(initialData.participants || []);
   const [saving, setSaving] = useState(false);
@@ -51,7 +53,7 @@ export const MeetingEditForm: React.FC<MeetingEditFormProps> = ({ initialData, o
     await onSave({
       title,
       date,
-      summary: { keyPoints, decisions },
+      summary: { keyPoints, decisions, transcript },
       tags,
       participants,
     });
@@ -104,6 +106,18 @@ export const MeetingEditForm: React.FC<MeetingEditFormProps> = ({ initialData, o
             </div>
           </div>
           <Separator />
+          {/* Transcript Preview Section */}
+          {transcript && (
+            <div>
+              <Label>Transcript (AI-generated, read-only)</Label>
+              <Textarea
+                value={transcript}
+                readOnly
+                className="mt-2 bg-orange-50 border-orange-200 text-gray-700 font-mono min-h-[120px] max-h-60 overflow-y-auto"
+              />
+            </div>
+          )}
+          <Separator />
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
               <Label>Tags</Label>
@@ -111,7 +125,7 @@ export const MeetingEditForm: React.FC<MeetingEditFormProps> = ({ initialData, o
                 value={tags.join(", ")}
                 onChange={e => setTags(e.target.value.split(",").map(t => t.trim()).filter(Boolean))}
                 placeholder="Comma separated tags"
-                className="mt-1"
+                className="mt-2"
               />
             </div>
             <div>
@@ -120,7 +134,7 @@ export const MeetingEditForm: React.FC<MeetingEditFormProps> = ({ initialData, o
                 value={participants.join(", ")}
                 onChange={e => setParticipants(e.target.value.split(",").map(t => t.trim()).filter(Boolean))}
                 placeholder="Comma separated participants"
-                className="mt-1"
+                className="mt-2"
               />
             </div>
           </div>
