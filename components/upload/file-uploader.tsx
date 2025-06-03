@@ -22,6 +22,7 @@ export function FileUploader() {
   const [error, setError] = useState<string | null>(null)
   const [aiData, setAiData] = useState<any | null>(null)
   const [editMode, setEditMode] = useState(false)
+  const [duration, setDuration] = useState<number | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const router = useRouter()
   const createMeeting = api.meeting.create.useMutation()
@@ -97,12 +98,14 @@ export function FileUploader() {
         return
       }
       const data = await res.json()
+      setDuration(data.duration || null)
       setAiData({
         summary: data.summary,
         title: data.summary?.title || file.name.replace(/\.[^/.]+$/, ""),
         date: new Date().toISOString().slice(0, 10),
         tags: data.summary?.tags || [],
         participants: data.summary?.participants || [],
+        duration: data.duration || null,
       })
       setEditMode(true)
       setIsUploading(false)
@@ -121,7 +124,7 @@ export function FileUploader() {
       const payload = {
         title: formData.title || formData.summary?.title || file?.name.replace(/\.[^/.]+$/, "") || "Untitled Meeting",
         audioUrl: audioUrl,
-        duration: 300,
+        duration: duration || 0,
         fileSize: file?.size || 0,
         status: "completed" as const,
         date: formData.date ? new Date(formData.date).toISOString() : new Date().toISOString(),
@@ -243,7 +246,7 @@ export function FileUploader() {
                     <div>
                       <p className="font-medium">{file.name}</p>
                       <p className="text-sm text-gray-500">
-                        {formatFileSize(file.size)} • {formatDuration(300)} {/* Assuming 5 min duration */}
+                        {formatFileSize(file.size)} • {duration !== null ? formatDuration(duration) : "..."}
                       </p>
                     </div>
                   </div>

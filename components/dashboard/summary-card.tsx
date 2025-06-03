@@ -21,6 +21,10 @@ export function SummaryCard({ summary }: SummaryCardProps) {
     day: "numeric",
   })
 
+  const formattedDuration = typeof summary.duration === "number"
+    ? `${Math.round(summary.duration / 60)} minutes`
+    : summary.duration;
+
   return (
     <Link href={`/summary/${summary.id}`}>
       <Card className="h-full overflow-hidden transition-all hover:shadow-md hover:border-orange-200 group">
@@ -38,7 +42,7 @@ export function SummaryCard({ summary }: SummaryCardProps) {
           </div>
           <div className="flex items-center text-sm text-gray-500 mb-2">
             <Clock className="mr-1 h-4 w-4 text-orange-400" />
-            <span>{summary.duration}</span>
+            <span>{formattedDuration}</span>
           </div>
           <div className="flex items-center text-sm text-gray-500">
             <Users className="mr-1 h-4 w-4 text-orange-400" />

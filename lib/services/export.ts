@@ -16,10 +16,14 @@ export const exportMeetingAsJson = (meeting: ExportableMeeting): string => {
 }
 
 export const exportMeetingAsMarkdown = (meeting: ExportableMeeting): string => {
+  const formattedDuration = typeof meeting.duration === "number"
+    ? `${Math.round(meeting.duration / 60)} minutes`
+    : meeting.duration;
+
   return `
 # ${meeting.title}
 Date: ${meeting.date ? new Date(meeting.date).toLocaleDateString() : ""}
-Duration: ${meeting.duration || ""}
+Duration: ${formattedDuration}
 
 ## Key Points
 ${meeting.summary?.keyPoints?.map((point) => `- ${point}`).join("\n") || ""}

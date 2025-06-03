@@ -5,6 +5,7 @@ import path from "path";
 import { randomUUID } from "crypto";
 import { summarizeMeeting } from "@/lib/services/meetingSummarizer";
 import { transcribeAudio } from "@/lib/services/transcription";
+import { parseBuffer } from "music-metadata";
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
@@ -53,14 +54,24 @@ export async function POST(req: NextRequest) {
   await writeFile(tempFilePath, buffer);
 
   try {
+    // Extract duration using music-metadata
+    let duration = 0;
+    try {
+      const metadata = await parseBuffer(buffer, file.type);
+      duration = Math.round(metadata.format.duration || 0);
+    } catch (err) {
+      // If duration extraction fails, fallback to 0
+      duration = 0;
+    }
+
     // Transcribe using the service
     const transcript = await transcribeAudio(file);
 
     // Summarize the transcript using Vercel AI SDK
     const summary = await summarizeMeeting(transcript);
 
-    // Return the transcript and summary
-    return NextResponse.json({ transcript, summary }, { status: 200 });
+    // Return the transcript, summary, and duration
+    return NextResponse.json({ transcript, summary, duration }, { status: 200 });
   } catch (error) {
     // Clean up temp file on error
     await unlink(tempFilePath).catch(() => {});

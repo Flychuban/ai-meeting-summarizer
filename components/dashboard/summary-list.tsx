@@ -38,6 +38,13 @@ export function SummaryList({ summaries }: SummaryListProps) {
     return matchesSearch && matchesTags
   })
 
+  const formattedSummaries = summaries.map((summary) => ({
+    ...summary,
+    duration: typeof summary.duration === "number"
+      ? `${Math.round(summary.duration / 60)} minutes`
+      : summary.duration,
+  }))
+
   const toggleTag = (tag: string) => {
     setSelectedTags((prev) => (prev.includes(tag) ? prev.filter((t) => t !== tag) : [...prev, tag]))
   }
@@ -128,7 +135,7 @@ export function SummaryList({ summaries }: SummaryListProps) {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.3 }}
             >
-              <SummaryCard key={summary.id} summary={summary} />
+              <SummaryCard key={summary.id} summary={formattedSummaries.find(s => s.id === summary.id) || summary} />
             </motion.div>
           ))}
         </motion.div>

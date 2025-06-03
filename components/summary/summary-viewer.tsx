@@ -53,6 +53,10 @@ export function SummaryViewer({ summary }: SummaryViewerProps) {
     day: "numeric",
   })
 
+  const formattedDuration = typeof summary.duration === "number"
+    ? `${Math.round(summary.duration / 60)} minutes`
+    : summary.duration;
+
   const handleAddTag = async (tag: string) => {
     if (tag && !tags.includes(tag)) {
       setTagLoading(true)
