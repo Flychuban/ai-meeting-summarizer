@@ -37,9 +37,10 @@ interface SummaryViewerProps {
   onEdit?: () => void
   onExport?: (format: "json" | "markdown" | "pdf") => void
   isAuthenticated?: boolean
+  onDelete?: () => void
 }
 
-export function SummaryViewer({ summary, onEdit, onExport, isAuthenticated }: SummaryViewerProps) {
+export function SummaryViewer({ summary, onEdit, onExport, isAuthenticated, onDelete }: SummaryViewerProps) {
   const [tags, setTags] = useState<string[]>(summary.tags)
   const [tagLoading, setTagLoading] = useState(false)
   const utils = api.useUtils()
@@ -48,6 +49,7 @@ export function SummaryViewer({ summary, onEdit, onExport, isAuthenticated }: Su
       utils.meeting.getById.invalidate(summary.id)
     },
   })
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false)
 
   const formattedDate = new Date(summary.date).toLocaleDateString("en-US", {
     year: "numeric",
@@ -140,6 +142,16 @@ export function SummaryViewer({ summary, onEdit, onExport, isAuthenticated }: Su
             <Download className="mr-2 h-4 w-4" />
             PDF
           </Button>
+          {isAuthenticated && (
+            <Button
+              variant="destructive"
+              size="sm"
+              className="transition-all duration-200"
+              onClick={() => setShowDeleteDialog(true)}
+            >
+              Delete
+            </Button>
+          )}
         </div>
       </div>
 
@@ -259,6 +271,31 @@ export function SummaryViewer({ summary, onEdit, onExport, isAuthenticated }: Su
           </motion.div>
         </TabsContent>
       </Tabs>
+
+      {showDeleteDialog && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30">
+          <Card className="w-full max-w-sm shadow-lg animate-in fade-in zoom-in">
+            <CardHeader>
+              <CardTitle>Delete Meeting?</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-sm text-gray-600">Are you sure you want to delete this meeting? This action cannot be undone.</p>
+            </CardContent>
+            <div className="flex justify-end gap-2 p-4 pt-0">
+              <Button variant="secondary" onClick={() => setShowDeleteDialog(false)}>Cancel</Button>
+              <Button
+                variant="destructive"
+                onClick={() => {
+                  setShowDeleteDialog(false)
+                  onDelete && onDelete()
+                }}
+              >
+                Delete
+              </Button>
+            </div>
+          </Card>
+        </div>
+      )}
     </div>
   )
 }

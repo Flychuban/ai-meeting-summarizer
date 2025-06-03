@@ -10,12 +10,15 @@ import { useState } from "react"
 import { ProtectedRoute } from "@/components/auth/protected-route"
 import { exportMeetingAsJson, exportMeetingAsMarkdown, exportMeetingAsPdf } from "@/lib/services/export"
 import { Meeting } from "@prisma/client"
+import { toast } from "sonner"
+import { useRouter } from "next/navigation"
 
 export default function MeetingDetailPage() {
   const params = useParams()
   const meetingId = params.id as string
   const { data: meeting, isLoading, isError } = api.meeting.getById.useQuery(meetingId)
   const [isEditing, setIsEditing] = useState(false)
+  const router = useRouter()
 
   const utils = api.useUtils()
   const updateMeeting = api.meeting.update.useMutation({
@@ -23,6 +26,23 @@ export default function MeetingDetailPage() {
       utils.meeting.getById.invalidate(meetingId)
       setIsEditing(false)
     },
+  })
+
+  const deleteMeeting = api.meeting.delete.useMutation({
+    onSuccess: () => {
+      toast.success("Meeting deleted successfully!", {
+        description: "Redirecting to dashboard...",
+        duration: 1800,
+        position: "top-center",
+        className: "bg-gradient-to-r from-orange-500 to-amber-500 text-white shadow-lg animate-in fade-in zoom-in"
+      })
+      setTimeout(() => {
+        router.push("/dashboard")
+      }, 1500)
+    },
+    onError: () => {
+      toast.error("Failed to delete meeting.")
+    }
   })
 
   const handleSave = async (data: any) => {
@@ -42,6 +62,10 @@ export default function MeetingDetailPage() {
     }
   }
 
+  const handleDelete = () => {
+    deleteMeeting.mutate(meetingId)
+  }
+
   if (isLoading) return <div className="flex justify-center py-12 text-lg text-gray-500">Loading...</div>
   if (isError) return <div className="flex justify-center py-12 text-lg text-red-500">Failed to load meeting.</div>
   if (!meeting) return <div className="flex justify-center py-12 text-lg text-red-500">Meeting not found.</div>
@@ -57,7 +81,11 @@ export default function MeetingDetailPage() {
       ...meeting,
       date: meeting.date || meeting.createdAt,
       transcript: meeting.summary?.transcript || "",
-      summary: meeting.summary || { keyPoints: [], actionItems: [], decisions: [] },
+      summary: {
+        keyPoints: meeting.summary?.keyPoints || [],
+        actionItems: Array.isArray((meeting.summary as any)?.actionItems) ? (meeting.summary as any).actionItems : [],
+        decisions: meeting.summary?.decisions || [],
+      },
       tags: meeting.tags?.map((tag: { name: string }) => tag.name) || [],
     }
     let content: string | Blob
@@ -108,6 +136,7 @@ export default function MeetingDetailPage() {
               summary: {
                 keyPoints: m.summary?.keyPoints || [],
                 decisions: m.summary?.decisions || [],
+                actionItems: Array.isArray(m.summary?.actionItems) ? m.summary.actionItems : [],
                 transcript: m.summary?.transcript || "",
               },
               duration: typeof m.duration === "number" ? `${Math.round(m.duration / 60)} minutes` : m.duration || "",
@@ -132,6 +161,7 @@ export default function MeetingDetailPage() {
               summary: {
                 keyPoints: m.summary?.keyPoints || [],
                 decisions: m.summary?.decisions || [],
+                actionItems: Array.isArray(m.summary?.actionItems) ? m.summary.actionItems : [],
                 transcript: m.summary?.transcript || "",
               },
               duration: typeof m.duration === "number" ? `${Math.round(m.duration / 60)} minutes` : m.duration || "",
@@ -143,6 +173,7 @@ export default function MeetingDetailPage() {
                   onEdit={() => setIsEditing(true)}
                   onExport={handleExport}
                   isAuthenticated={true}
+                  onDelete={handleDelete}
                 />
               </div>
             )
