@@ -4,7 +4,7 @@ import { safeDbOperation } from "@/lib/db";
 import { authConfig } from "@/lib/auth/config"
 
 const summarySchema = z.object({
-  transcript: z.string(),
+  transcript: z.string().optional(),
   keyPoints: z.array(z.string()),
   decisions: z.array(z.string()),
 });
@@ -50,10 +50,9 @@ export const meetingRouter = createTRPCRouter({
               date: new Date(input.date),
               userId,
               tags: { connectOrCreate: tagConnectOrCreate },
-              participants: { connectOrCreate: participantConnectOrCreate },
               summary: {
                 create: {
-                  transcript: input.summary.transcript,
+                  transcript: input.summary.transcript ?? "",
                   keyPoints: input.summary.keyPoints,
                   decisions: input.summary.decisions,
                 },
@@ -62,7 +61,6 @@ export const meetingRouter = createTRPCRouter({
             include: {
               summary: true,
               tags: true,
-              participants: true,
             },
           });
         },
@@ -77,7 +75,6 @@ export const meetingRouter = createTRPCRouter({
           include: {
             summary: true,
             tags: true,
-            participants: true,
           },
           orderBy: {
             createdAt: "desc",
@@ -97,7 +94,6 @@ export const meetingRouter = createTRPCRouter({
             include: {
               summary: true,
               tags: true,
-              participants: true,
             },
           }),
         "Failed to fetch meeting"
@@ -141,10 +137,11 @@ export const meetingRouter = createTRPCRouter({
           if (updateData.summary) {
             await ctx.prisma.summary.upsert({
               where: { meetingId: input.id },
-              update: updateData.summary,
+              update: { ...updateData.summary, transcript: updateData.summary.transcript ?? "" },
               create: {
                 meetingId: input.id,
                 ...updateData.summary,
+                transcript: updateData.summary.transcript ?? "",
               },
             });
             delete updateData.summary;
@@ -155,7 +152,6 @@ export const meetingRouter = createTRPCRouter({
             include: {
               summary: true,
               tags: true,
-              participants: true,
             },
           });
         },
@@ -187,7 +183,6 @@ export const meetingRouter = createTRPCRouter({
           include: {
             summary: true,
             tags: true,
-            participants: true,
           },
           orderBy: {
             createdAt: "desc",

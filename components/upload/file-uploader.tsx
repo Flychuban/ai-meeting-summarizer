@@ -98,9 +98,8 @@ export function FileUploader() {
       }
       const data = await res.json()
       setAiData({
-        transcript: data.transcript,
         summary: data.summary,
-        title: file.name.replace(/\.[^/.]+$/, ""),
+        title: data.summary?.title || file.name.replace(/\.[^/.]+$/, ""),
         date: new Date().toISOString().slice(0, 10),
         tags: [],
         participants: [],
@@ -120,7 +119,7 @@ export function FileUploader() {
       const baseUrl = typeof window !== "undefined" ? window.location.origin : "http://localhost:3000";
       const audioUrl = file ? `${baseUrl}/uploads/${file.name}` : `${baseUrl}/uploads/placeholder.mp3`;
       const payload = {
-        title: formData.title || file?.name.replace(/\.[^/.]+$/, "") || "Untitled Meeting",
+        title: formData.title || formData.summary?.title || file?.name.replace(/\.[^/.]+$/, "") || "Untitled Meeting",
         audioUrl: audioUrl,
         duration: 300,
         fileSize: file?.size || 0,
@@ -129,7 +128,6 @@ export function FileUploader() {
         tags: Array.isArray(formData.tags) ? formData.tags.map(String) : (typeof formData.tags === "string" ? formData.tags.split(",").map((t: string) => t.trim()).filter(Boolean) : []),
         participants: Array.isArray(formData.participants) ? formData.participants.map(String) : (typeof formData.participants === "string" ? formData.participants.split(",").map((t: string) => t.trim()).filter(Boolean) : []),
         summary: {
-          transcript: formData.transcript || "",
           keyPoints: Array.isArray(formData.summary?.keyPoints) ? formData.summary.keyPoints.map(String) : [],
           decisions: Array.isArray(formData.summary?.decisions) ? formData.summary.decisions.map(String) : [],
         },

@@ -11,7 +11,6 @@ export interface MeetingEditFormProps {
   initialData: {
     title?: string;
     date?: string | Date;
-    transcript: string;
     summary: {
       keyPoints: string[];
       actionItems: string[];
@@ -29,7 +28,6 @@ export const MeetingEditForm: React.FC<MeetingEditFormProps> = ({ initialData, o
   const [date, setDate] = useState(
     initialData.date ? format(new Date(initialData.date), "yyyy-MM-dd") : format(new Date(), "yyyy-MM-dd")
   );
-  const [transcript, setTranscript] = useState(initialData.transcript);
   const [keyPoints, setKeyPoints] = useState(initialData.summary.keyPoints);
   const [decisions, setDecisions] = useState(initialData.summary.decisions);
   const [tags, setTags] = useState(initialData.tags || []);
@@ -53,7 +51,7 @@ export const MeetingEditForm: React.FC<MeetingEditFormProps> = ({ initialData, o
     await onSave({
       title,
       date,
-      summary: { transcript, keyPoints, decisions },
+      summary: { keyPoints, decisions },
       tags,
       participants,
     });
@@ -77,11 +75,6 @@ export const MeetingEditForm: React.FC<MeetingEditFormProps> = ({ initialData, o
               <Label>Date</Label>
               <Input type="date" value={date} onChange={e => setDate(e.target.value)} required className="mt-1" />
             </div>
-          </div>
-          <Separator />
-          <div>
-            <Label>Transcript</Label>
-            <Textarea value={transcript} onChange={e => setTranscript(e.target.value)} rows={6} required className="mt-1" />
           </div>
           <Separator />
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
