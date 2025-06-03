@@ -10,6 +10,7 @@ interface SummaryCardProps {
     date: string
     duration: string
     tags: string[]
+    participants: string[]
   }
 }
 
@@ -41,7 +42,10 @@ export function SummaryCard({ summary }: SummaryCardProps) {
           </div>
           <div className="flex items-center text-sm text-gray-500">
             <Users className="mr-1 h-4 w-4 text-orange-400" />
-            <span>5 participants</span>
+            <span>{summary.participants.length} participant{summary.participants.length !== 1 ? 's' : ''}</span>
+            {summary.participants.length > 0 && (
+              <span className="ml-2 truncate text-xs text-gray-400" title={summary.participants.join(", ")}>({summary.participants.slice(0, 3).join(", ")}{summary.participants.length > 3 ? ", ..." : ""})</span>
+            )}
           </div>
         </CardContent>
         <CardFooter className="flex flex-wrap gap-2 border-t pt-4">

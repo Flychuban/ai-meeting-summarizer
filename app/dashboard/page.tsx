@@ -19,9 +19,10 @@ export default function DashboardPage() {
   const summaries = (data || []).map((meeting) => ({
     id: meeting.id,
     title: meeting.title,
-    date: meeting.createdAt,
+    date: typeof meeting.createdAt === 'string' ? meeting.createdAt : meeting.createdAt.toISOString(),
     duration: meeting.duration ? `${Math.round(meeting.duration / 60)} minutes` : "",
     tags: meeting.tags?.map((tag) => tag.name) || [],
+    participants: meeting.participants?.map((p) => p.name) || [],
   }))
 
   return (

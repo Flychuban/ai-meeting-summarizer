@@ -50,6 +50,7 @@ export const meetingRouter = createTRPCRouter({
               date: new Date(input.date),
               userId,
               tags: { connectOrCreate: tagConnectOrCreate },
+              participants: { connectOrCreate: participantConnectOrCreate },
               summary: {
                 create: {
                   transcript: input.summary.transcript ?? "",
@@ -61,6 +62,7 @@ export const meetingRouter = createTRPCRouter({
             include: {
               summary: true,
               tags: true,
+              participants: true,
             },
           });
         },
@@ -75,6 +77,7 @@ export const meetingRouter = createTRPCRouter({
           include: {
             summary: true,
             tags: true,
+            participants: true,
           },
           orderBy: {
             createdAt: "desc",
@@ -94,6 +97,7 @@ export const meetingRouter = createTRPCRouter({
             include: {
               summary: true,
               tags: true,
+              participants: true,
             },
           }),
         "Failed to fetch meeting"
@@ -183,6 +187,7 @@ export const meetingRouter = createTRPCRouter({
           include: {
             summary: true,
             tags: true,
+            participants: true,
           },
           orderBy: {
             createdAt: "desc",

@@ -101,8 +101,8 @@ export function FileUploader() {
         summary: data.summary,
         title: data.summary?.title || file.name.replace(/\.[^/.]+$/, ""),
         date: new Date().toISOString().slice(0, 10),
-        tags: [],
-        participants: [],
+        tags: data.summary?.tags || [],
+        participants: data.summary?.participants || [],
       })
       setEditMode(true)
       setIsUploading(false)

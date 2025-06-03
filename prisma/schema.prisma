@@ -73,7 +73,7 @@ model Meeting {
 
 model Participant {
   id        String    @id @default(cuid())
-  name      String
+  name      String    @unique
   meetings  Meeting[] // Many-to-many
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt

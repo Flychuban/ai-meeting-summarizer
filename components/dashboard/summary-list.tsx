@@ -14,6 +14,7 @@ interface Summary {
   date: string
   duration: string
   tags: string[]
+  participants: string[]
 }
 
 interface SummaryListProps {
