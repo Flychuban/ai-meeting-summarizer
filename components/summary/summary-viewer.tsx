@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Badge } from "@/components/ui/badge"
-import { Calendar, Clock, Download, Copy, FileJson, FileText, ArrowLeft, Users, Share2, Check } from "lucide-react"
+import { Calendar, Clock, Download, FileJson, FileText, ArrowLeft, Users } from "lucide-react"
 import { SummaryTags } from "@/components/summary/summary-tags"
 import { JsonViewer } from "@/components/summary/json-viewer"
 import Link from "next/link"
@@ -34,11 +34,13 @@ interface Summary {
 
 interface SummaryViewerProps {
   summary: Summary
+  onEdit?: () => void
+  onExport?: (format: "json" | "markdown" | "pdf") => void
+  isAuthenticated?: boolean
 }
 
-export function SummaryViewer({ summary }: SummaryViewerProps) {
+export function SummaryViewer({ summary, onEdit, onExport, isAuthenticated }: SummaryViewerProps) {
   const [tags, setTags] = useState<string[]>(summary.tags)
-  const [copied, setCopied] = useState(false)
   const [tagLoading, setTagLoading] = useState(false)
   const utils = api.useUtils()
   const updateMeeting = api.meeting.update.useMutation({
@@ -87,24 +89,6 @@ export function SummaryViewer({ summary }: SummaryViewerProps) {
     }
   }
 
-  const handleCopyToClipboard = () => {
-    const text = `
-# ${summary.title}
-Date: ${formattedDate}
-Duration: ${summary.duration}
-
-## Key Points
-${summary.summary.keyPoints.map((point) => `- ${point}`).join("\n")}
-
-## Decisions
-${summary.summary.decisions.map((decision) => `- ${decision}`).join("\n")}
-    `
-
-    navigator.clipboard.writeText(text)
-    setCopied(true)
-    setTimeout(() => setCopied(false), 2000)
-  }
-
   const getInitials = (name: string) => {
     return name
       .split(" ")
@@ -138,25 +122,23 @@ ${summary.summary.decisions.map((decision) => `- ${decision}`).join("\n")}
           </div>
         </div>
         <div className="flex gap-2">
-          <Button variant="outline" size="sm" onClick={handleCopyToClipboard} className="transition-all duration-200">
-            {copied ? <Check className="mr-2 h-4 w-4 text-green-500" /> : <Copy className="mr-2 h-4 w-4" />}
-            {copied ? "Copied!" : "Copy"}
-          </Button>
-          <Button variant="outline" size="sm" className="transition-all duration-200">
+          {isAuthenticated && onEdit && (
+            <Button variant="outline" size="sm" onClick={onEdit} className="transition-all duration-200">
+              <svg className="mr-2 h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 1 1 3 3L7 19.5 3 21l1.5-4L16.5 3.5z"/></svg>
+              Edit
+            </Button>
+          )}
+          <Button variant="outline" size="sm" onClick={() => onExport && onExport("json") } className="transition-all duration-200">
             <FileJson className="mr-2 h-4 w-4" />
             JSON
           </Button>
-          <Button variant="outline" size="sm" className="transition-all duration-200">
+          <Button variant="outline" size="sm" onClick={() => onExport && onExport("markdown") } className="transition-all duration-200">
             <FileText className="mr-2 h-4 w-4" />
             Markdown
           </Button>
-          <Button variant="outline" size="sm" className="transition-all duration-200">
+          <Button variant="outline" size="sm" onClick={() => onExport && onExport("pdf") } className="transition-all duration-200">
             <Download className="mr-2 h-4 w-4" />
             PDF
-          </Button>
-          <Button variant="outline" size="sm" className="transition-all duration-200">
-            <Share2 className="mr-2 h-4 w-4" />
-            Share
           </Button>
         </div>
       </div>

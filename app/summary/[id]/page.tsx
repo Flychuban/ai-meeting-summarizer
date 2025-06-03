@@ -138,18 +138,12 @@ export default function MeetingDetailPage() {
             }
             return (
               <div className="space-y-6">
-                <div className="flex justify-between items-center">
-                  <h1 className="text-2xl font-bold">{hydratedMeeting.title}</h1>
-                  <div className="flex gap-2">
-                    <Button variant="outline" onClick={() => setIsEditing(true)}>
-                      Edit
-                    </Button>
-                    <Button variant="outline" onClick={() => handleExport("json")}>JSON</Button>
-                    <Button variant="outline" onClick={() => handleExport("markdown")}>Markdown</Button>
-                    <Button variant="outline" onClick={() => handleExport("pdf")}>PDF</Button>
-                  </div>
-                </div>
-                <SummaryViewer summary={hydratedMeeting as any} />
+                <SummaryViewer
+                  summary={hydratedMeeting as any}
+                  onEdit={() => setIsEditing(true)}
+                  onExport={handleExport}
+                  isAuthenticated={true}
+                />
               </div>
             )
           })()
