@@ -4,7 +4,7 @@ import type React from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 
-import { useState, useRef } from "react"
+import { useState, useRef, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Progress } from "@/components/ui/progress"
 import { Card, CardContent } from "@/components/ui/card"
@@ -26,6 +26,47 @@ export function FileUploader() {
   const fileInputRef = useRef<HTMLInputElement>(null)
   const router = useRouter()
   const createMeeting = api.meeting.create.useMutation()
+  const progressTarget = isUploading ? (isComplete ? 100 : 90) : 0;
+
+  // Smooth progress animation effect (non-linear, slower, ease-out)
+  useEffect(() => {
+    let frame: number;
+    let startTime: number | null = null;
+    const duration = 10000; // 10 seconds to reach 90%
+    const easeOut = (t: number) => 1 - Math.pow(1 - t, 2); // Quadratic ease-out
+
+    if (isUploading && !isComplete) {
+      const animate = (timestamp: number) => {
+        if (!startTime) startTime = timestamp;
+        const elapsed = timestamp - startTime;
+        const t = Math.min(elapsed / duration, 1);
+        const eased = easeOut(t);
+        const target = 90 * eased;
+        setUploadProgress((prev) => (prev < target ? target : prev));
+        if (t < 1 && !isComplete) {
+          frame = requestAnimationFrame(animate);
+        }
+      };
+      frame = requestAnimationFrame(animate);
+    }
+    return () => {
+      cancelAnimationFrame(frame);
+    };
+  }, [isUploading, isComplete]);
+
+  // Jump to 100% when complete
+  useEffect(() => {
+    if (isComplete) {
+      setUploadProgress(100);
+    }
+  }, [isComplete]);
+
+  // Reset progress on error or cancel
+  useEffect(() => {
+    if (!isUploading && !isComplete) {
+      setUploadProgress(0);
+    }
+  }, [isUploading, isComplete]);
 
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault()
@@ -269,7 +310,7 @@ export function FileUploader() {
                 {(isUploading || isComplete) && (
                   <div className="mt-4 space-y-2">
                     <div className="flex items-center justify-between text-sm">
-                      <span>{isComplete ? "Upload complete" : `Uploading... ${uploadProgress}%`}</span>
+                      <span>{isComplete ? "Upload complete" : `Uploading... ${Math.round(uploadProgress)}%`}</span>
                       {isComplete && <Check className="h-4 w-4 text-green-500" />}
                     </div>
                     <Progress
