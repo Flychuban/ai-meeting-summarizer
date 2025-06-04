@@ -6,6 +6,13 @@ const config = {
   typescript: {
     ignoreBuildErrors: true,
   },
+  webpack: (config: any) => {
+    config.resolve.alias = {
+      ...config.resolve.alias,
+      '@': './src',
+    };
+    return config;
+  },
 };
 
 export default config;
