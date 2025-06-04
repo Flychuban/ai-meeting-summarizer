@@ -2,13 +2,16 @@
 
 import type React from "react"
 import Link from "next/link"
+import { useRouter } from "next/navigation"
 
-import { useState, useRef } from "react"
+import { useState, useRef, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Progress } from "@/components/ui/progress"
 import { Card, CardContent } from "@/components/ui/card"
 import { FileAudio, Upload, Check, Trash2, AlertCircle } from "lucide-react"
 import { motion, AnimatePresence } from "framer-motion"
+import { MeetingEditForm } from "@/components/MeetingEditForm"
+import { api } from "@/lib/trpc/client"
 
 export function FileUploader() {
   const [file, setFile] = useState<File | null>(null)
@@ -17,7 +20,53 @@ export function FileUploader() {
   const [isUploading, setIsUploading] = useState(false)
   const [isComplete, setIsComplete] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [aiData, setAiData] = useState<any | null>(null)
+  const [editMode, setEditMode] = useState(false)
+  const [duration, setDuration] = useState<number | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const router = useRouter()
+  const createMeeting = api.meeting.create.useMutation()
+  const progressTarget = isUploading ? (isComplete ? 100 : 90) : 0;
+
+  // Smooth progress animation effect (non-linear, slower, ease-out)
+  useEffect(() => {
+    let frame: number;
+    let startTime: number | null = null;
+    const duration = 10000; // 10 seconds to reach 90%
+    const easeOut = (t: number) => 1 - Math.pow(1 - t, 2); // Quadratic ease-out
+
+    if (isUploading && !isComplete) {
+      const animate = (timestamp: number) => {
+        if (!startTime) startTime = timestamp;
+        const elapsed = timestamp - startTime;
+        const t = Math.min(elapsed / duration, 1);
+        const eased = easeOut(t);
+        const target = 90 * eased;
+        setUploadProgress((prev) => (prev < target ? target : prev));
+        if (t < 1 && !isComplete) {
+          frame = requestAnimationFrame(animate);
+        }
+      };
+      frame = requestAnimationFrame(animate);
+    }
+    return () => {
+      cancelAnimationFrame(frame);
+    };
+  }, [isUploading, isComplete]);
+
+  // Jump to 100% when complete
+  useEffect(() => {
+    if (isComplete) {
+      setUploadProgress(100);
+    }
+  }, [isComplete]);
+
+  // Reset progress on error or cancel
+  useEffect(() => {
+    if (!isUploading && !isComplete) {
+      setUploadProgress(0);
+    }
+  }, [isUploading, isComplete]);
 
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault()
@@ -71,24 +120,71 @@ export function FileUploader() {
     }
   }
 
-  const handleUpload = () => {
+  const handleUpload = async () => {
     if (!file) return
-
     setIsUploading(true)
     setError(null)
-
-    // Simulate upload progress
-    let progress = 0
-    const interval = setInterval(() => {
-      progress += 5
-      setUploadProgress(progress)
-
-      if (progress >= 100) {
-        clearInterval(interval)
+    setUploadProgress(0)
+    try {
+      const formData = new FormData()
+      formData.append("audioFile", file)
+      const res = await fetch("/api/upload", {
+        method: "POST",
+        body: formData,
+      })
+      if (!res.ok) {
+        const err = await res.json()
+        setError(err.error || "Upload failed")
         setIsUploading(false)
-        setIsComplete(true)
+        return
       }
-    }, 200)
+      const data = await res.json()
+      setDuration(data.duration || null)
+      setAiData({
+        summary: {
+          ...data.summary,
+          transcript: data.transcript || "",
+        },
+        title: data.summary?.title || file.name.replace(/\.[^/.]+$/, ""),
+        date: new Date().toISOString().slice(0, 10),
+        tags: data.summary?.tags || [],
+        participants: data.summary?.participants || [],
+        duration: data.duration || null,
+      })
+      setEditMode(true)
+      setIsUploading(false)
+      setIsComplete(true)
+    } catch (err: any) {
+      setError(err.message || "Upload failed")
+      setIsUploading(false)
+    }
+  }
+
+  const handleSaveMeeting = async (formData: any) => {
+    try {
+      // Ensure audioUrl is a valid absolute URL
+      const baseUrl = typeof window !== "undefined" ? window.location.origin : "http://localhost:3000";
+      const audioUrl = file ? `${baseUrl}/uploads/${file.name}` : `${baseUrl}/uploads/placeholder.mp3`;
+      const payload = {
+        title: formData.title || formData.summary?.title || file?.name.replace(/\.[^/.]+$/, "") || "Untitled Meeting",
+        audioUrl: audioUrl,
+        duration: duration || 0,
+        fileSize: file?.size || 0,
+        status: "completed" as const,
+        date: formData.date ? new Date(formData.date).toISOString() : new Date().toISOString(),
+        tags: Array.isArray(formData.tags) ? formData.tags.map(String) : (typeof formData.tags === "string" ? formData.tags.split(",").map((t: string) => t.trim()).filter(Boolean) : []),
+        participants: Array.isArray(formData.participants) ? formData.participants.map(String) : (typeof formData.participants === "string" ? formData.participants.split(",").map((t: string) => t.trim()).filter(Boolean) : []),
+        summary: {
+          keyPoints: Array.isArray(formData.summary?.keyPoints) ? formData.summary.keyPoints.map(String) : [],
+          decisions: Array.isArray(formData.summary?.decisions) ? formData.summary.decisions.map(String) : [],
+          transcript: formData.summary?.transcript || "",
+        },
+      }
+      await createMeeting.mutateAsync(payload)
+      router.push("/dashboard")
+    } catch (err: any) {
+      setError(err.message || "Failed to save meeting")
+    }
   }
 
   const formatFileSize = (bytes: number) => {
@@ -103,6 +199,23 @@ export function FileUploader() {
     const minutes = Math.floor(seconds / 60)
     const remainingSeconds = Math.floor(seconds % 60)
     return `${minutes}:${remainingSeconds.toString().padStart(2, "0")}`
+  }
+
+  if (aiData && editMode) {
+    return (
+      <div className="mt-8">
+        <MeetingEditForm
+          initialData={aiData}
+          onSave={handleSaveMeeting}
+          onCancel={() => {
+            setAiData(null)
+            setEditMode(false)
+            setFile(null)
+            setIsComplete(false)
+          }}
+        />
+      </div>
+    )
   }
 
   return (
@@ -178,7 +291,7 @@ export function FileUploader() {
                     <div>
                       <p className="font-medium">{file.name}</p>
                       <p className="text-sm text-gray-500">
-                        {formatFileSize(file.size)} • {formatDuration(300)} {/* Assuming 5 min duration */}
+                        {formatFileSize(file.size)} • {duration !== null ? formatDuration(duration) : "..."}
                       </p>
                     </div>
                   </div>
@@ -197,7 +310,7 @@ export function FileUploader() {
                 {(isUploading || isComplete) && (
                   <div className="mt-4 space-y-2">
                     <div className="flex items-center justify-between text-sm">
-                      <span>{isComplete ? "Upload complete" : `Uploading... ${uploadProgress}%`}</span>
+                      <span>{isComplete ? "Upload complete" : `Uploading... ${Math.round(uploadProgress)}%`}</span>
                       {isComplete && <Check className="h-4 w-4 text-green-500" />}
                     </div>
                     <Progress

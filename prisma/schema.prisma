@@ -55,30 +55,39 @@ model Session {
 }
 
 model Meeting {
-  id        String   @id @default(cuid())
-  title     String
-  audioUrl  String
-  duration  Int // Duration in seconds
-  fileSize  Int // File size in bytes
-  status    String // "pending", "processing", "completed", "failed"
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  summary   Summary?
-  tags      Tag[]
+  id           String        @id @default(cuid())
+  title        String
+  audioUrl     String
+  duration     Int // Duration in seconds
+  fileSize     Int // File size in bytes
+  status       String // "pending", "processing", "completed", "failed"
+  date         DateTime // NEW: Meeting date
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  userId       String
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  summary      Summary?
+  tags         Tag[]
+  participants Participant[] // NEW: Many-to-many
+}
+
+model Participant {
+  id        String    @id @default(cuid())
+  name      String    @unique
+  meetings  Meeting[] // Many-to-many
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
 }
 
 model Summary {
-  id          String   @id @default(cuid())
-  meetingId   String   @unique
-  meeting     Meeting  @relation(fields: [meetingId], references: [id], onDelete: Cascade)
-  transcript  String   @db.Text
-  keyPoints   String[] // Array of key points
-  decisions   String[] // Array of decisions made
-  actionItems String[] // Array of action items
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id         String   @id @default(cuid())
+  meetingId  String   @unique
+  meeting    Meeting  @relation(fields: [meetingId], references: [id], onDelete: Cascade)
+  transcript String   @db.Text
+  keyPoints  String[] // Array of key points
+  decisions  String[] // Array of decisions made
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
 }
 
 model Tag {
