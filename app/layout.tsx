@@ -28,6 +28,9 @@ export const metadata: Metadata = {
   alternates: {
     canonical: "/",
   },
+  icons: {
+    icon: "/favicon.ico",
+  },
   openGraph: {
     type: "website",
     locale: "en_US",
@@ -40,7 +43,7 @@ export const metadata: Metadata = {
         url: "/og-image.png",
         width: 1200,
         height: 630,
-        alt: "AI Meeting Summarizer",
+        alt: "AI Meeting Summarizer - Transform meetings into actionable insights",
       },
     ],
   },

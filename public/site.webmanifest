@@ -1,0 +1,45 @@
+{
+  "name": "AI Meeting Summarizer",
+  "short_name": "Meeting AI",
+  "description": "Transform your meeting recordings into concise summaries with AI",
+  "icons": [
+    {
+      "src": "/favicon.ico",
+      "sizes": "32x32",
+      "type": "image/x-icon"
+    }
+  ],
+  "theme_color": "#f97316",
+  "background_color": "#ffffff",
+  "display": "standalone",
+  "start_url": "/",
+  "orientation": "portrait",
+  "scope": "/",
+  "categories": ["productivity", "business", "utilities"],
+  "screenshots": [
+    {
+      "src": "/og-image.png",
+      "sizes": "1200x630",
+      "type": "image/png",
+      "platform": "wide",
+      "label": "AI Meeting Summarizer Dashboard"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Upload Meeting",
+      "short_name": "Upload",
+      "description": "Upload a new meeting for summarization",
+      "url": "/upload",
+      "icons": [{ "src": "/favicon.ico", "sizes": "32x32" }]
+    },
+    {
+      "name": "Dashboard",
+      "short_name": "Dashboard",
+      "description": "View your meeting summaries",
+      "url": "/dashboard",
+      "icons": [{ "src": "/favicon.ico", "sizes": "32x32" }]
+    }
+  ],
+  "prefer_related_applications": false
+} 
