@@ -1,22 +1,10 @@
-import type { Metadata } from "next"
+"use client"
+
 import Link from "next/link"
 import { FileUploader } from "@/components/upload/file-uploader"
 import { Button } from "@/components/ui/button"
 import { ArrowLeft, HelpCircle, FileAudio, Clock, Volume2 } from "lucide-react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-
-export const metadata: Metadata = {
-  title: "Upload Meeting",
-  description: "Upload your meeting recordings in MP3 or WAV format. Our AI will transcribe and summarize your meetings, extracting key points, decisions, and action items.",
-  openGraph: {
-    title: "Upload Meeting | AI Meeting Summarizer",
-    description: "Upload your meeting recordings in MP3 or WAV format. Our AI will transcribe and summarize your meetings, extracting key points, decisions, and action items.",
-  },
-  robots: {
-    index: false,
-    follow: true,
-  },
-}
 
 export default function UploadPage() {
   return (

@@ -1,6 +1,5 @@
 "use client"
 
-import type { Metadata } from "next"
 import { DashboardHeader } from "@/components/dashboard/dashboard-header"
 import { SummaryList } from "@/components/dashboard/summary-list"
 import { EmptyState } from "@/components/dashboard/empty-state"
@@ -9,19 +8,6 @@ import { BarChart, FileAudio, Clock, Users } from "lucide-react"
 import { ProtectedRoute } from "@/components/auth/protected-route"
 import { api } from "@/lib/trpc/client"
 import { useSession } from "next-auth/react"
-
-export const metadata: Metadata = {
-  title: "Dashboard",
-  description: "Manage your meeting summaries, view analytics, and track your productivity. Access all your transcribed and summarized meetings in one place.",
-  openGraph: {
-    title: "Dashboard | AI Meeting Summarizer",
-    description: "Manage your meeting summaries, view analytics, and track your productivity. Access all your transcribed and summarized meetings in one place.",
-  },
-  robots: {
-    index: false,
-    follow: true,
-  },
-}
 
 export default function DashboardPage() {
   const { data: session } = useSession()

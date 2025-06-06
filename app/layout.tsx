@@ -6,10 +6,12 @@ import { ThemeProvider } from "@/components/theme-provider"
 import { TRPCProvider } from "@/lib/trpc/provider"
 import { AuthProvider } from "@/components/providers/session-provider"
 import { Toaster } from "sonner"
+import { homeMetadata } from "./metadata"
 
 const inter = Inter({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
+  ...homeMetadata,
   title: {
     default: "AI Meeting Summarizer | Transcribe & Summarize Meetings with AI",
     template: "%s | AI Meeting Summarizer"
