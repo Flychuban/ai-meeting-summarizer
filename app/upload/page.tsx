@@ -6,8 +6,16 @@ import { ArrowLeft, HelpCircle, FileAudio, Clock, Volume2 } from "lucide-react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 
 export const metadata: Metadata = {
-  title: "Upload Meeting - AI Meeting Summarizer",
-  description: "Upload your meeting audio for transcription and summarization",
+  title: "Upload Meeting",
+  description: "Upload your meeting recordings in MP3 or WAV format. Our AI will transcribe and summarize your meetings, extracting key points, decisions, and action items.",
+  openGraph: {
+    title: "Upload Meeting | AI Meeting Summarizer",
+    description: "Upload your meeting recordings in MP3 or WAV format. Our AI will transcribe and summarize your meetings, extracting key points, decisions, and action items.",
+  },
+  robots: {
+    index: false,
+    follow: true,
+  },
 }
 
 export default function UploadPage() {

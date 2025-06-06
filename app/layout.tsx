@@ -10,8 +10,61 @@ import { Toaster } from "sonner"
 const inter = Inter({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
-  title: "AI Meeting Summarizer",
-  description: "Transcribe and summarize your meetings with AI",
+  title: {
+    default: "AI Meeting Summarizer | Transcribe & Summarize Meetings with AI",
+    template: "%s | AI Meeting Summarizer"
+  },
+  description: "Transform your meeting recordings into concise summaries with AI. Upload MP3/WAV files, get automated transcriptions, key points, decisions, and action items. Save time and never miss important details.",
+  keywords: ["meeting summarizer", "AI transcription", "meeting notes", "audio to text", "meeting summary", "AI assistant", "productivity tool"],
+  authors: [{ name: "AI Meeting Summarizer Team" }],
+  creator: "AI Meeting Summarizer",
+  publisher: "AI Meeting Summarizer",
+  formatDetection: {
+    email: false,
+    address: false,
+    telephone: false,
+  },
+  metadataBase: new URL("https://ai-meeting-summarizer.vercel.app"),
+  alternates: {
+    canonical: "/",
+  },
+  openGraph: {
+    type: "website",
+    locale: "en_US",
+    url: "https://ai-meeting-summarizer.vercel.app",
+    title: "AI Meeting Summarizer | Transcribe & Summarize Meetings with AI",
+    description: "Transform your meeting recordings into concise summaries with AI. Upload MP3/WAV files, get automated transcriptions, key points, decisions, and action items.",
+    siteName: "AI Meeting Summarizer",
+    images: [
+      {
+        url: "/og-image.png",
+        width: 1200,
+        height: 630,
+        alt: "AI Meeting Summarizer",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "AI Meeting Summarizer | Transcribe & Summarize Meetings with AI",
+    description: "Transform your meeting recordings into concise summaries with AI. Upload MP3/WAV files, get automated transcriptions, key points, decisions, and action items.",
+    images: ["/og-image.png"],
+    creator: "@ai_meeting_summarizer",
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
+  verification: {
+    google: "your-google-site-verification",
+  },
 }
 
 export default function RootLayout({

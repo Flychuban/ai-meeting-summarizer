@@ -10,6 +10,19 @@ import { ProtectedRoute } from "@/components/auth/protected-route"
 import { api } from "@/lib/trpc/client"
 import { useSession } from "next-auth/react"
 
+export const metadata: Metadata = {
+  title: "Dashboard",
+  description: "Manage your meeting summaries, view analytics, and track your productivity. Access all your transcribed and summarized meetings in one place.",
+  openGraph: {
+    title: "Dashboard | AI Meeting Summarizer",
+    description: "Manage your meeting summaries, view analytics, and track your productivity. Access all your transcribed and summarized meetings in one place.",
+  },
+  robots: {
+    index: false,
+    follow: true,
+  },
+}
+
 export default function DashboardPage() {
   const { data: session } = useSession()
   const username = session?.user?.name || "User"

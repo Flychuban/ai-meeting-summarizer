@@ -1,0 +1,15 @@
+# Allow all crawlers
+User-agent: *
+Allow: /
+
+# Disallow protected routes
+Disallow: /dashboard
+Disallow: /upload
+Disallow: /summary
+Disallow: /api/*
+
+# Sitemap location
+Sitemap: https://ai-meeting-summarizer.vercel.app/sitemap.xml
+
+# Crawl-delay
+Crawl-delay: 10 

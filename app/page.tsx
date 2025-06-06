@@ -1,5 +1,6 @@
 "use client"
 
+import type { Metadata } from "next"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { ArrowRight, FileAudio, Clock, CheckCircle } from "lucide-react"
@@ -15,6 +16,15 @@ import {
   DropdownMenuLabel,
 } from "@/components/ui/dropdown-menu"
 import { LogOut } from "lucide-react"
+
+export const metadata: Metadata = {
+  title: "Home",
+  description: "Transform your meeting recordings into concise summaries with AI. Upload MP3/WAV files, get automated transcriptions, key points, decisions, and action items.",
+  openGraph: {
+    title: "AI Meeting Summarizer | Home",
+    description: "Transform your meeting recordings into concise summaries with AI. Upload MP3/WAV files, get automated transcriptions, key points, decisions, and action items.",
+  },
+}
 
 export default function Home() {
   const { data: session, status } = useSession()
